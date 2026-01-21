@@ -56,8 +56,9 @@ After adding all three secrets:
 - [ ] `VITE_GOOGLE_SHEETS_RANGE` is set
 - [ ] Google Sheet is set to "Anyone with the link can view"
 - [ ] API key has HTTP referrer restrictions configured
+- [ ] **GitHub Pages is enabled** (Settings → Pages → Source: GitHub Actions)
 
-**Note:** GitHub Pages will be automatically enabled when you first push to the main branch. You don't need to manually enable it in Settings.
+**Important:** You must manually enable GitHub Pages in Settings before the workflow will work.
 
 ## Testing
 

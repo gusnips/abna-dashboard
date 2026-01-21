@@ -10,16 +10,19 @@ This guide walks through deploying the ABNA Campaign Dashboard to GitHub Pages.
 
 ## Initial Setup
 
-### 1. Enable GitHub Pages (Automatic)
+### 1. Enable GitHub Pages (Manual Setup Required)
 
-GitHub Pages will be automatically enabled when you first push to the main branch with the workflow. The workflow includes automatic enablement configuration.
-
-If you prefer to enable it manually:
+You need to manually enable GitHub Pages in your repository settings:
 
 1. Go to your repository on GitHub
-2. Navigate to **Settings** → **Pages**
-3. Under "Build and deployment", set **Source** to "GitHub Actions"
-4. Save the settings
+2. Click **Settings** (top navigation bar)
+3. Scroll down the left sidebar and click **Pages** (under "Code and automation")
+4. Under "Build and deployment":
+   - **Source**: Select **"GitHub Actions"** from the dropdown
+   - Do NOT select "Deploy from a branch"
+5. The page will auto-save
+
+**Important:** This must be done before the first deployment will work.
 
 ### 2. Configure Repository Secrets
 
