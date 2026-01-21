@@ -10,7 +10,11 @@ This guide walks through deploying the ABNA Campaign Dashboard to GitHub Pages.
 
 ## Initial Setup
 
-### 1. Enable GitHub Pages
+### 1. Enable GitHub Pages (Automatic)
+
+GitHub Pages will be automatically enabled when you first push to the main branch with the workflow. The workflow includes automatic enablement configuration.
+
+If you prefer to enable it manually:
 
 1. Go to your repository on GitHub
 2. Navigate to **Settings** → **Pages**
@@ -118,6 +122,20 @@ After deployment completes:
    - No console errors
 
 ## Troubleshooting
+
+### "Get Pages site failed" Error
+
+If you see this error on first deployment:
+```
+Error: Get Pages site failed. Please verify that the repository has Pages enabled...
+```
+
+**Solution:** The workflow now automatically enables GitHub Pages. This error should only occur once on the first deployment attempt. Simply:
+
+1. Re-run the failed workflow (click "Re-run all jobs" in the Actions tab)
+2. Or push another commit to trigger a new deployment
+
+The workflow will automatically enable GitHub Pages on the next run.
 
 ### Build Fails
 
