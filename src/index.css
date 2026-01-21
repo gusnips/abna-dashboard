@@ -1,0 +1,6 @@
+/* Import custom chart styles */
+@import './styles/charts.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

@@ -1,0 +1,88 @@
+/**
+ * Custom Chart Styling
+ * Consistent color scheme and styling for all Recharts components
+ */
+
+/* Chart Container Styling */
+.chart-container {
+    background-color: white;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+}
+
+.chart-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: rgb(31 41 55);
+}
+
+.chart-empty-state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 16rem;
+    background-color: rgb(249 250 251);
+    border-radius: 0.5rem;
+}
+
+.chart-empty-text {
+    color: rgb(107 114 128);
+}
+
+/* Recharts Custom Styling */
+.recharts-wrapper {
+    font-family: inherit;
+}
+
+.recharts-cartesian-axis-tick-value {
+    color: rgb(75 85 99);
+    font-size: 0.875rem;
+}
+
+.recharts-legend-item-text {
+    color: rgb(55 65 81);
+}
+
+.recharts-tooltip-wrapper {
+    outline: none;
+}
+
+.recharts-default-tooltip {
+    background-color: white;
+    border: 1px solid rgb(229 231 235);
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    padding: 0.75rem;
+}
+
+.recharts-tooltip-label {
+    font-weight: 600;
+    color: rgb(31 41 55);
+    margin-bottom: 0.5rem;
+}
+
+.recharts-tooltip-item {
+    color: rgb(55 65 81);
+}
+
+/* Chart Color Palette */
+:root {
+    --chart-color-1: #3B82F6;
+    /* Blue */
+    --chart-color-2: #10B981;
+    /* Green */
+    --chart-color-3: #FBBF24;
+    /* Yellow */
+    --chart-color-4: #F97316;
+    /* Orange */
+    --chart-color-5: #8B5CF6;
+    /* Purple */
+    --chart-color-6: #EC4899;
+    /* Pink */
+    --chart-color-7: #14B8A6;
+    /* Teal */
+    --chart-color-8: #6366F1;
+    /* Indigo */
+}
