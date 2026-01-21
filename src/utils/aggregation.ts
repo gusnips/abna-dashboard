@@ -24,42 +24,68 @@ import type {
  * 
  * @param records - Array of campaign records to aggregate
  * @returns Summary statistics object with all calculated metrics
- * 
- * Requirements: 4.1-4.7
  */
 export function calculateSummaryStatistics(records: CampaignRecord[]): SummaryStatistics {
     if (records.length === 0) {
         return {
-            totalPanels: 0,
-            firstTimeResidents: 0,
-            totalResidents: 0,
-            transferAmount: 0,
-            speakersCount: 0,
-            audienceReached: 0,
+            activityCount: 0,
+            serversCount: 0,
             participantsCount: 0,
+            statesCount: 0,
+            totalMaterials: 0,
+            totalCost: 0,
         };
     }
 
-    return records.reduce(
-        (stats, record) => ({
-            totalPanels: stats.totalPanels + 1, // Each record represents one panel/activity
-            firstTimeResidents: stats.firstTimeResidents + 0, // TODO: Need to clarify data source for this field
-            totalResidents: stats.totalResidents + 0, // TODO: Need to clarify data source for this field
-            transferAmount: stats.transferAmount + record.serviceCost,
-            speakersCount: stats.speakersCount + record.speakersCount,
-            audienceReached: stats.audienceReached + record.audienceReached,
-            participantsCount: stats.participantsCount + record.participantsCount,
-        }),
-        {
-            totalPanels: 0,
-            firstTimeResidents: 0,
-            totalResidents: 0,
-            transferAmount: 0,
-            speakersCount: 0,
-            audienceReached: 0,
-            participantsCount: 0,
+    // Count unique states
+    const uniqueStates = new Set<string>();
+
+    // Calculate totals
+    let totalServers = 0;
+    let totalParticipants = 0;
+    let totalMaterialsCount = 0;
+    let totalCostSum = 0;
+
+    for (const record of records) {
+        // Add state to unique set
+        if (record.state) {
+            uniqueStates.add(record.state);
         }
-    );
+
+        // Sum servers (speakers)
+        totalServers += record.speakersCount;
+
+        // Sum participants
+        totalParticipants += record.participantsCount;
+
+        // Sum all materials
+        const materials = record.materials;
+        totalMaterialsCount +=
+            materials.cartazes +
+            materials.panfletos +
+            materials.listaGrupos +
+            materials.cartao +
+            materials.folder +
+            materials.ips +
+            materials.folhetos +
+            materials.textoBasico +
+            materials.pastaRP +
+            materials.lixoCar +
+            materials.calendario +
+            materials.outros;
+
+        // Sum cost
+        totalCostSum += record.serviceCost;
+    }
+
+    return {
+        activityCount: records.length,
+        serversCount: totalServers,
+        participantsCount: totalParticipants,
+        statesCount: uniqueStates.size,
+        totalMaterials: totalMaterialsCount,
+        totalCost: totalCostSum,
+    };
 }
 
 // ============================================================================

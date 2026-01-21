@@ -61,44 +61,132 @@ describe('calculateSummaryStatistics', () => {
     it('should return zero statistics for empty array', () => {
         const stats = calculateSummaryStatistics([]);
 
-        expect(stats.totalPanels).toBe(0);
-        expect(stats.speakersCount).toBe(0);
+        expect(stats.activityCount).toBe(0);
+        expect(stats.serversCount).toBe(0);
         expect(stats.participantsCount).toBe(0);
-        expect(stats.audienceReached).toBe(0);
-        expect(stats.transferAmount).toBe(0);
+        expect(stats.statesCount).toBe(0);
+        expect(stats.totalMaterials).toBe(0);
+        expect(stats.totalCost).toBe(0);
     });
 
     it('should calculate correct totals for single record', () => {
         const record = createMockRecord({
+            state: 'SP',
             speakersCount: 3,
             participantsCount: 25,
-            audienceReached: 40,
             serviceCost: 150,
+            materials: {
+                cartazes: 10,
+                panfletos: 20,
+                listaGrupos: 5,
+                cartao: 0,
+                folder: 0,
+                ips: 0,
+                folhetos: 0,
+                textoBasico: 0,
+                pastaRP: 0,
+                lixoCar: 0,
+                calendario: 0,
+                outros: 0,
+            },
         });
 
         const stats = calculateSummaryStatistics([record]);
 
-        expect(stats.totalPanels).toBe(1);
-        expect(stats.speakersCount).toBe(3);
+        expect(stats.activityCount).toBe(1);
+        expect(stats.serversCount).toBe(3);
         expect(stats.participantsCount).toBe(25);
-        expect(stats.audienceReached).toBe(40);
-        expect(stats.transferAmount).toBe(150);
+        expect(stats.statesCount).toBe(1);
+        expect(stats.totalMaterials).toBe(35); // 10 + 20 + 5
+        expect(stats.totalCost).toBe(150);
     });
 
     it('should aggregate statistics across multiple records', () => {
         const records = [
-            createMockRecord({ speakersCount: 2, participantsCount: 20, audienceReached: 30, serviceCost: 100 }),
-            createMockRecord({ speakersCount: 3, participantsCount: 15, audienceReached: 25, serviceCost: 150 }),
-            createMockRecord({ speakersCount: 1, participantsCount: 10, audienceReached: 15, serviceCost: 50 }),
+            createMockRecord({
+                state: 'SP',
+                speakersCount: 2,
+                participantsCount: 20,
+                serviceCost: 100,
+                materials: {
+                    cartazes: 10,
+                    panfletos: 20,
+                    listaGrupos: 0,
+                    cartao: 0,
+                    folder: 0,
+                    ips: 0,
+                    folhetos: 0,
+                    textoBasico: 0,
+                    pastaRP: 0,
+                    lixoCar: 0,
+                    calendario: 0,
+                    outros: 0,
+                },
+            }),
+            createMockRecord({
+                state: 'RJ',
+                speakersCount: 3,
+                participantsCount: 15,
+                serviceCost: 150,
+                materials: {
+                    cartazes: 5,
+                    panfletos: 10,
+                    listaGrupos: 5,
+                    cartao: 0,
+                    folder: 0,
+                    ips: 0,
+                    folhetos: 0,
+                    textoBasico: 0,
+                    pastaRP: 0,
+                    lixoCar: 0,
+                    calendario: 0,
+                    outros: 0,
+                },
+            }),
+            createMockRecord({
+                state: 'SP',
+                speakersCount: 1,
+                participantsCount: 10,
+                serviceCost: 50,
+                materials: {
+                    cartazes: 0,
+                    panfletos: 15,
+                    listaGrupos: 0,
+                    cartao: 0,
+                    folder: 0,
+                    ips: 0,
+                    folhetos: 0,
+                    textoBasico: 0,
+                    pastaRP: 0,
+                    lixoCar: 0,
+                    calendario: 0,
+                    outros: 0,
+                },
+            }),
         ];
 
         const stats = calculateSummaryStatistics(records);
 
-        expect(stats.totalPanels).toBe(3);
-        expect(stats.speakersCount).toBe(6);
-        expect(stats.participantsCount).toBe(45);
-        expect(stats.audienceReached).toBe(70);
-        expect(stats.transferAmount).toBe(300);
+        expect(stats.activityCount).toBe(3);
+        expect(stats.serversCount).toBe(6); // 2 + 3 + 1
+        expect(stats.participantsCount).toBe(45); // 20 + 15 + 10
+        expect(stats.statesCount).toBe(2); // SP and RJ
+        expect(stats.totalMaterials).toBe(65); // 10+20 + 5+10+5 + 15
+        expect(stats.totalCost).toBe(300); // 100 + 150 + 50
+    });
+
+    it('should count unique states correctly', () => {
+        const records = [
+            createMockRecord({ state: 'SP' }),
+            createMockRecord({ state: 'SP' }),
+            createMockRecord({ state: 'RJ' }),
+            createMockRecord({ state: 'MG' }),
+            createMockRecord({ state: 'SP' }),
+        ];
+
+        const stats = calculateSummaryStatistics(records);
+
+        expect(stats.statesCount).toBe(3); // SP, RJ, MG
     });
 });
 

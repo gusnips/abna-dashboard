@@ -3,23 +3,16 @@ import { render, screen } from '@testing-library/react';
 import { Header } from './Header';
 
 describe('Header', () => {
-    it('should render ABNA logo image', () => {
+    it('should render NA logo image', () => {
         render(<Header />);
-        const abnaLogo = screen.getByAltText('ABNA Logo');
-        expect(abnaLogo).toBeInTheDocument();
-        expect(abnaLogo).toHaveAttribute('src', '/abna-logo.svg');
+        const naLogo = screen.getByAltText('Narcóticos Anônimos');
+        expect(naLogo).toBeInTheDocument();
+        expect(naLogo).toHaveAttribute('src', 'https://www.na.org.br/wp-content/uploads/2020/04/logo-narcoticos-anonimos.png');
     });
 
-    it('should render IP logo image', () => {
+    it('should display title "Relatório Nacional de RP/IP"', () => {
         render(<Header />);
-        const ipLogo = screen.getByAltText('IP Logo');
-        expect(ipLogo).toBeInTheDocument();
-        expect(ipLogo).toHaveAttribute('src', '/ip-logo.svg');
-    });
-
-    it('should display title "RELATÓRIO DIGITAL H&I"', () => {
-        render(<Header />);
-        expect(screen.getByText('RELATÓRIO DIGITAL H&I')).toBeInTheDocument();
+        expect(screen.getByText('Relatório Nacional de RP/IP')).toBeInTheDocument();
     });
 
     it('should display subtitle with CSR when provided', () => {
@@ -37,6 +30,6 @@ describe('Header', () => {
     it('should not display subtitle when CSR is not provided', () => {
         render(<Header />);
         // Should only show the title, no subtitle
-        expect(screen.getByText('RELATÓRIO DIGITAL H&I')).toBeInTheDocument();
+        expect(screen.getByText('Relatório Nacional de RP/IP')).toBeInTheDocument();
     });
 });

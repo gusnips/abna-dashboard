@@ -25,7 +25,7 @@ export function Header({ selectedCSR }: HeaderProps) {
                     {/* Title Section */}
                     <div className="flex-1 text-center md:text-left">
                         <h1 className="text-2xl md:text-3xl font-bold text-white">
-                            RELATÓRIO DIGITAL H&I
+                            Relatório Nacional de RP/IP
                         </h1>
                         {selectedCSR && (
                             <p className="text-sm md:text-base text-white/90 mt-1">

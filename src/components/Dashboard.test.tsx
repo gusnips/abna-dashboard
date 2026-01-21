@@ -159,10 +159,10 @@ describe('Dashboard Component', () => {
         });
 
         // Check that header is rendered
-        expect(screen.getByText(/RELATÓRIO DIGITAL H&I/i)).toBeInTheDocument();
+        expect(screen.getByText(/Relatório Nacional de RP\/IP/i)).toBeInTheDocument();
 
         // Check that summary cards section is present (at least one card)
-        expect(screen.getByText(/Total de Painéis/i)).toBeInTheDocument();
+        expect(screen.getByText(/Quantidade de Atividades/i)).toBeInTheDocument();
 
         // Check that charts are rendered (by their titles)
         expect(screen.getByText(/Estrutura de Serviço/i)).toBeInTheDocument();

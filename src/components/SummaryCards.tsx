@@ -1,16 +1,13 @@
 /**
  * SummaryCards container component
  * 
- * Displays all 7 summary statistics in a responsive grid layout:
- * - Total de Painéis
- * - Qtdade Residentes 1ª Vez
- * - Qtdade Total de Residentes
- * - Valor Repasse
- * - Qtdade Oradores
- * - Público Atingido
+ * Displays all 6 summary statistics in a responsive grid layout:
+ * - Quantidade de Atividades
+ * - Servidores
  * - Participantes
- * 
- * Requirements: 4.1-4.7
+ * - Estados
+ * - Materiais Doados
+ * - Custo Total
  */
 
 import { useMemo } from 'react';
@@ -30,40 +27,16 @@ export function SummaryCards() {
     }, [filteredRecords]);
 
     return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             <SummaryCard
-                title="Total de Painéis"
-                value={stats.totalPanels}
+                title="Quantidade de Atividades"
+                value={stats.activityCount}
                 format="number"
             />
 
             <SummaryCard
-                title="Qtdade Residentes 1ª Vez"
-                value={stats.firstTimeResidents}
-                format="number"
-            />
-
-            <SummaryCard
-                title="Qtdade Total de Residentes"
-                value={stats.totalResidents}
-                format="number"
-            />
-
-            <SummaryCard
-                title="Valor Repasse"
-                value={stats.transferAmount}
-                format="currency"
-            />
-
-            <SummaryCard
-                title="Qtdade Oradores"
-                value={stats.speakersCount}
-                format="number"
-            />
-
-            <SummaryCard
-                title="Público Atingido"
-                value={stats.audienceReached}
+                title="Servidores"
+                value={stats.serversCount}
                 format="number"
             />
 
@@ -71,6 +44,24 @@ export function SummaryCards() {
                 title="Participantes"
                 value={stats.participantsCount}
                 format="number"
+            />
+
+            <SummaryCard
+                title="Estados"
+                value={stats.statesCount}
+                format="number"
+            />
+
+            <SummaryCard
+                title="Materiais Doados"
+                value={stats.totalMaterials}
+                format="number"
+            />
+
+            <SummaryCard
+                title="Custo Total"
+                value={stats.totalCost}
+                format="currency"
             />
         </div>
     );

@@ -125,13 +125,12 @@ export interface FilterOptions {
  * Aggregated statistics for summary cards
  */
 export interface SummaryStatistics {
-    totalPanels: number;
-    firstTimeResidents: number;
-    totalResidents: number;
-    transferAmount: number;
-    speakersCount: number;
-    audienceReached: number;
+    activityCount: number;
+    serversCount: number;
     participantsCount: number;
+    statesCount: number;
+    totalMaterials: number;
+    totalCost: number;
 }
 
 // ============================================================================
