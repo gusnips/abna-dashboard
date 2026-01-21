@@ -1,7 +1,10 @@
 {
-  "name": "dashboard",
+  "name": "abna-campaign-dashboard",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "description": "Relatório Nacional de RP/IP da ABNA - Associação Brasileira de Narcóticos Anônimos",
+  "author": "ABNA",
+  "license": "UNLICENSED",
   "type": "module",
   "scripts": {
     "dev": "vite",

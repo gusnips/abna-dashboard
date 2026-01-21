@@ -20,7 +20,7 @@ Before deploying to GitHub Pages, you need to configure three repository secrets
 - Enable Google Sheets API
 - Create credentials → API Key
 - Restrict the key to Google Sheets API only
-- Add HTTP referrer restriction: `https://YOUR-USERNAME.github.io/*`
+- Add HTTP referrer restriction: `https://gusnips.github.io/*`
 
 ---
 
@@ -72,7 +72,7 @@ git push origin main
 
 Then check:
 1. **Actions** tab - workflow should run successfully
-2. Visit `https://YOUR-USERNAME.github.io/abna-campaign-dashboard/`
+2. Visit `https://gusnips.github.io/abna-campaign-dashboard/`
 3. Data should load from Google Sheets
 
 ## Troubleshooting

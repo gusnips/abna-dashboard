@@ -55,8 +55,8 @@ Ensure your API key has the following restrictions:
 
 1. **API restrictions**: Restrict to Google Sheets API only
 2. **Application restrictions**: Add HTTP referrer:
-   - `https://YOUR-USERNAME.github.io/abna-campaign-dashboard/*`
-   - Replace `YOUR-USERNAME` with your GitHub username or organization name
+   - `https://gusnips.github.io/abna-campaign-dashboard/*`
+   - Replace `gusnips` with your GitHub username or organization name
 3. Enable quota monitoring and alerts
 
 ### 4. Verify Spreadsheet Configuration
@@ -116,7 +116,7 @@ The preview server will start at `http://localhost:4173` (or another port if 417
 After deployment completes:
 
 1. Check the **Actions** tab for workflow status
-2. Visit your deployed site: `https://YOUR-USERNAME.github.io/abna-campaign-dashboard/`
+2. Visit your deployed site: `https://gusnips.github.io/abna-campaign-dashboard/`
 3. Verify:
    - Data loads from Google Sheets
    - All filters work correctly

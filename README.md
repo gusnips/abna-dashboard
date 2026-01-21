@@ -1,5 +1,7 @@
 # ABNA Campaign Dashboard
 
+Relatório Nacional de RP/IP da ABNA - Associação Brasileira de Narcóticos Anônimos.
+
 A React-based dashboard for visualizing Narcotics Anonymous campaign data from Google Sheets.
 
 ## Tech Stack
