@@ -1,125 +1,125 @@
-# ABNA Campaign Dashboard
+# Painel de Campanhas da ABNA
 
 Relatório Nacional de RP/IP da ABNA - Associação Brasileira de Narcóticos Anônimos.
 
-A React-based dashboard for visualizing Narcotics Anonymous campaign data from Google Sheets.
+Um painel em React para visualizar os dados das campanhas de Narcóticos Anônimos a partir do Google Sheets.
 
-## Tech Stack
+## Tecnologias
 
-- **Framework**: React 18+ with TypeScript
-- **Build Tool**: Vite 7+
-- **Package Manager**: Bun
-- **Styling**: Tailwind CSS 4+
-- **Charts**: Recharts
-- **Testing**: Vitest + @testing-library/react + fast-check (PBT)
-- **Deployment**: GitHub Pages
+- **Framework**: React 18+ com TypeScript
+- **Ferramenta de build**: Vite 7+
+- **Gerenciador de pacotes**: Bun
+- **Estilização**: Tailwind CSS 4+
+- **Gráficos**: Recharts
+- **Testes**: Vitest + @testing-library/react + fast-check (PBT)
+- **Implantação**: GitHub Pages
 
-## Getting Started
+## Primeiros Passos
 
-### Prerequisites
+### Pré-requisitos
 
-- [Bun](https://bun.sh/) installed on your system
+- [Bun](https://bun.sh/) instalado no seu sistema
 
-### Installation
+### Instalação
 
 ```bash
-# Install dependencies
+# Instalar dependências
 bun install
 
-# Copy environment variables
+# Copiar variáveis de ambiente
 cp .env.example .env
 
-# Add your Google Sheets API key to .env
+# Adicione sua chave da API do Google Sheets ao .env
 ```
 
-### Development
+### Desenvolvimento
 
 ```bash
-# Start development server
+# Iniciar servidor de desenvolvimento
 bun run dev
 
-# Run tests
+# Executar testes
 bun run test
 
-# Run tests once (CI mode)
+# Executar testes uma vez (modo CI)
 bun run test:run
 
-# Build for production
+# Gerar build de produção
 bun run build
 
-# Preview production build
+# Pré-visualizar o build de produção
 bun run preview
 ```
 
-## Project Structure
+## Estrutura do Projeto
 
 ```
 src/
-├── components/     # React components
-├── contexts/       # React contexts for state management
-├── services/       # Data fetching services
-├── types/          # TypeScript type definitions
-├── utils/          # Utility functions
-└── test/           # Test setup and utilities
+├── components/     # Componentes React
+├── contexts/       # Contextos React para gerenciamento de estado
+├── services/       # Serviços de busca de dados
+├── types/          # Definições de tipos TypeScript
+├── utils/          # Funções utilitárias
+└── test/           # Configuração e utilitários de teste
 ```
 
-## Environment Variables
+## Variáveis de Ambiente
 
-Create a `.env` file based on `.env.example`:
+Crie um arquivo `.env` baseado no `.env.example`:
 
-- `VITE_GOOGLE_SHEETS_API_KEY`: Your Google Sheets API key
-- `VITE_GOOGLE_SHEETS_SPREADSHEET_ID`: The spreadsheet ID (default provided)
-- `VITE_GOOGLE_SHEETS_RANGE`: The range to fetch (e.g., "Sheet1!A:Z")
+- `VITE_GOOGLE_SHEETS_API_KEY`: Sua chave da API do Google Sheets
+- `VITE_GOOGLE_SHEETS_SPREADSHEET_ID`: O ID da planilha (valor padrão já fornecido)
+- `VITE_GOOGLE_SHEETS_RANGE`: O intervalo a ser buscado (ex.: "Sheet1!A:Z")
 
-## Deployment
+## Implantação
 
-The project is configured for automatic deployment to GitHub Pages via GitHub Actions. 
+O projeto está configurado para implantação automática no GitHub Pages via GitHub Actions.
 
-For detailed deployment instructions, see [DEPLOYMENT.md](./DEPLOYMENT.md).
+Para instruções detalhadas de implantação, consulte [DEPLOYMENT.md](./DEPLOYMENT.md).
 
-### Quick Start
+### Início Rápido
 
-1. **Enable GitHub Pages**: In your repository settings, go to Pages and set the source to "GitHub Actions"
+1. **Ative o GitHub Pages**: Nas configurações do repositório, vá em Pages e defina a origem como "GitHub Actions"
 
-2. **Configure API Key**: The Google Sheets API key needs to be configured as a repository secret:
-   - Go to repository Settings → Secrets and variables → Actions
-   - Add a new repository secret named `VITE_GOOGLE_SHEETS_API_KEY`
-   - Set the value to your Google Sheets API key
+2. **Configure a chave da API**: A chave da API do Google Sheets precisa ser configurada como um segredo do repositório:
+   - Acesse Settings → Secrets and variables → Actions
+   - Adicione um novo segredo de repositório chamado `VITE_GOOGLE_SHEETS_API_KEY`
+   - Defina o valor como sua chave da API do Google Sheets
 
-3. **Deploy**: Push to the `main` branch to trigger automatic deployment
+3. **Implante**: Faça push para a branch `main` para acionar a implantação automática
 
-The workflow will:
-- Install dependencies using Bun
-- Run the production build
-- Deploy to GitHub Pages
+O workflow irá:
+- Instalar as dependências usando Bun
+- Executar o build de produção
+- Implantar no GitHub Pages
 
-### Manual Deployment
+### Implantação Manual
 
-To test the production build locally:
+Para testar o build de produção localmente:
 
 ```bash
-# Build for production
+# Gerar build de produção
 bun run build
 
-# Preview the production build
+# Pré-visualizar o build de produção
 bun run preview
 ```
 
-The production build will be output to the `dist/` directory.
+O build de produção será gerado no diretório `dist/`.
 
-## Testing
+## Testes
 
-The project uses a dual testing approach:
+O projeto usa uma abordagem dupla de testes:
 
-- **Unit Tests**: Specific examples and edge cases using Vitest
-- **Property-Based Tests**: Universal correctness properties using fast-check
+- **Testes unitários**: Exemplos específicos e casos extremos usando Vitest
+- **Testes baseados em propriedades**: Propriedades universais de correção usando fast-check
 
-Run all tests with:
+Execute todos os testes com:
 
 ```bash
 bun run test:run
 ```
 
-## License
+## Licença
 
-This project is for internal use by ABNA (Associação Brasileira de Narcóticos Anônimos).
+Este projeto é de uso interno da ABNA (Associação Brasileira de Narcóticos Anônimos).

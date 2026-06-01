@@ -1,13 +1,13 @@
 /**
- * Core TypeScript types and interfaces for ABNA Campaign Dashboard
+ * Tipos e interfaces TypeScript principais para o Dashboard de Campanha ABNA
  */
 
 // ============================================================================
-// Campaign Data Types
+// Tipos de Dados de Campanha
 // ============================================================================
 
 /**
- * Materials distributed during a campaign activity
+ * Materiais distribuídos durante uma atividade de campanha
  */
 export interface MaterialsDistributed {
     cartazes: number;
@@ -25,17 +25,17 @@ export interface MaterialsDistributed {
 }
 
 /**
- * Service structure types
+ * Tipos de estrutura de serviço
  */
 export type ServiceStructure = 'Sub-comitê' | 'Oficina' | 'Área' | 'Outros';
 
 /**
- * Activity format types
+ * Tipos de formato de atividade
  */
 export type ActivityFormat = 'Presencial' | 'Híbrido' | 'Virtual' | 'Online';
 
 /**
- * CSR to CSA mapping for regional selections
+ * Mapeamento CSR para CSA para seleções regionais
  */
 export interface CSRCSAMap {
     'CSR 10 Brasil'?: string;
@@ -50,10 +50,12 @@ export interface CSRCSAMap {
     'CSR Rio Grande do Sul'?: string;
     'CSR Terra do Sol'?: string;
     'CSR UAI'?: string;
+    /** Permite lookup por um nome de CSR arbitrário resolvido em tempo de execução */
+    [csr: string]: string | undefined;
 }
 
 /**
- * Complete campaign record representing a single form submission
+ * Registro completo de campanha representando uma única submissão de formulário
  */
 export interface CampaignRecord {
     id: string;
@@ -83,16 +85,16 @@ export interface CampaignRecord {
 }
 
 // ============================================================================
-// Filter Types
+// Tipos de Filtro
 // ============================================================================
 
 /**
- * Geographic scope for filtering
+ * Escopo geográfico para filtragem
  */
 export type GeographicScope = 'brasil' | 'csa' | 'region' | 'state' | 'city';
 
 /**
- * Filter state managing all active filters
+ * Estado de filtro gerenciando todos os filtros ativos
  */
 export interface FilterState {
     geographicScope: GeographicScope;
@@ -107,7 +109,7 @@ export interface FilterState {
 }
 
 /**
- * Available filter options extracted from data
+ * Opções de filtro disponíveis extraídas dos dados
  */
 export interface FilterOptions {
     csas: string[];
@@ -118,36 +120,38 @@ export interface FilterOptions {
 }
 
 // ============================================================================
-// Summary Statistics Types
+// Tipos de Estatísticas Resumidas
 // ============================================================================
 
 /**
- * Aggregated statistics for summary cards
+ * Estatísticas agregadas para cards de resumo
  */
 export interface SummaryStatistics {
     activityCount: number;
     serversCount: number;
     participantsCount: number;
+    audienceReached: number;
     statesCount: number;
+    citiesCount: number;
     totalMaterials: number;
     totalCost: number;
 }
 
 // ============================================================================
-// Chart Data Types
+// Tipos de Dados de Gráfico
 // ============================================================================
 
 /**
- * Generic chart data point for pie and bar charts
+ * Ponto de dados genérico de gráfico para gráficos de pizza e barras
  */
 export interface ChartData {
     name: string;
     value: number;
-    [key: string]: string | number; // Index signature for Recharts compatibility
+    [key: string]: string | number; // Assinatura de índice para compatibilidade com Recharts
 }
 
 /**
- * Time series data point for line charts
+ * Ponto de dados de série temporal para gráficos de linha
  */
 export interface TimeSeriesData {
     date: string;
@@ -155,7 +159,7 @@ export interface TimeSeriesData {
 }
 
 /**
- * Ranking item for geographic rankings
+ * Item de ranking para rankings geográficos
  */
 export interface RankingItem {
     name: string;
@@ -164,30 +168,39 @@ export interface RankingItem {
 }
 
 /**
- * Material row for materials table
+ * Linha de material para tabela de materiais
  */
 export interface MaterialRow {
     material: string;
     quantity: number;
 }
 
+/**
+ * Linha de detalhamento por CSA combinando contagem de atividades e público atingido
+ */
+export interface CSABreakdownRow {
+    csa: string;
+    activityCount: number;
+    audienceReached: number;
+}
+
 // ============================================================================
-// Raw Data Types
+// Tipos de Dados Brutos
 // ============================================================================
 
 /**
- * Raw row from Google Sheets API
+ * Linha bruta da API do Google Sheets
  */
 export interface RawSheetRow {
     [key: string]: string | number | null;
 }
 
 // ============================================================================
-// Context Types
+// Tipos de Contexto
 // ============================================================================
 
 /**
- * Data context value providing campaign records
+ * Valor do contexto de dados fornecendo registros de campanha
  */
 export interface DataContextValue {
     records: CampaignRecord[];
@@ -197,7 +210,7 @@ export interface DataContextValue {
 }
 
 /**
- * Filter context value providing filtered data and filter controls
+ * Valor do contexto de filtro fornecendo dados filtrados e controles de filtro
  */
 export interface FilterContextValue {
     filters: FilterState;
@@ -209,11 +222,11 @@ export interface FilterContextValue {
 }
 
 // ============================================================================
-// Service Configuration Types
+// Tipos de Configuração de Serviço
 // ============================================================================
 
 /**
- * Google Sheets API configuration
+ * Configuração da API do Google Sheets
  */
 export interface GoogleSheetsConfig {
     apiKey: string;
@@ -222,18 +235,18 @@ export interface GoogleSheetsConfig {
 }
 
 // ============================================================================
-// Global Type Extensions
+// Extensões de Tipo Global
 // ============================================================================
 
 /**
- * Error tracker interface for optional error logging service
+ * Interface de rastreador de erros para serviço opcional de log de erros
  */
 export interface ErrorTracker {
     logError: (error: Error, errorInfo: Record<string, unknown>) => void;
 }
 
 /**
- * Extend Window interface to include optional error tracker
+ * Estende a interface Window para incluir rastreador de erros opcional
  */
 declare global {
     interface Window {
@@ -241,5 +254,5 @@ declare global {
     }
 }
 
-// This export is needed to make this file a module
+// Este export é necessário para tornar este arquivo um módulo
 export { };

@@ -1,10 +1,19 @@
-// React components will be defined here
+// Componentes React serão definidos aqui
 export { Header } from './Header';
 export { FilterBar } from './FilterBar';
 export { SummaryCard } from './SummaryCard';
 export { SummaryCards } from './SummaryCards';
+export { SummaryCardsView } from './SummaryCardsView';
+export { CategoryBarChart } from './CategoryBarChart';
+export { CSABreakdownTable } from './CSABreakdownTable';
+export { CSRSwitcher } from './CSRSwitcher';
+export { CSRPillNav } from './CSRPillNav';
 export { ServiceStructurePieChart } from './ServiceStructurePieChart';
+export { ServiceFormatPieChart } from './ServiceFormatPieChart';
 export { ActivityTypeColumnChart } from './ActivityTypeColumnChart';
+export { ActivityColumnChart } from './ActivityColumnChart';
+export { ActivityByHourChart } from './ActivityByHourChart';
+export { RegionalActivityChart } from './RegionalActivityChart';
 export { TimeSeriesLineChart } from './TimeSeriesLineChart';
 export { GeographicRanking } from './GeographicRanking';
 export { MaterialsTable } from './MaterialsTable';

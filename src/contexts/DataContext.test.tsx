@@ -1,6 +1,6 @@
 /**
- * Unit tests for DataContext
- * Tests data fetching, caching, error handling, and offline mode
+ * Testes unitários para DataContext
+ * Testa busca de dados, cache, tratamento de erros e modo offline
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
@@ -11,22 +11,22 @@ import * as services from '../services';
 import type { GoogleSheetsService } from '../services/GoogleSheetsService';
 import * as utils from '../utils/DataParser';
 
-// Mock the GoogleSheetsService
+// Mock do GoogleSheetsService
 vi.mock('../services');
 
-// Mock the DataParser
+// Mock do DataParser
 vi.mock('../utils/DataParser');
 
-// Test component that uses the DataContext
+// Componente de teste que usa o DataContext
 function TestComponent() {
     const { records, loading, error, refetch } = useData();
 
     return (
         <div>
-            <div data-testid="loading">{loading ? 'Loading' : 'Not Loading'}</div>
-            <div data-testid="error">{error ? error.message : 'No Error'}</div>
+            <div data-testid="loading">{loading ? 'Carregando' : 'Não Carregando'}</div>
+            <div data-testid="error">{error ? error.message : 'Sem Erro'}</div>
             <div data-testid="records-count">{records.length}</div>
-            <button onClick={refetch}>Refetch</button>
+            <button onClick={refetch}>Recarregar</button>
         </div>
     );
 }
@@ -36,19 +36,19 @@ describe('DataContext', () => {
         vi.clearAllMocks();
     });
 
-    it('should throw error when useData is used outside DataProvider', () => {
-        // Suppress console.error for this test
+    it('deve lançar erro quando useData é usado fora do DataProvider', () => {
+        // Suprime console.error para este teste
         const consoleError = vi.spyOn(console, 'error').mockImplementation(() => { });
 
         expect(() => {
             render(<TestComponent />);
-        }).toThrow('useData must be used within a DataProvider');
+        }).toThrow('useData deve ser usado dentro de um DataProvider');
 
         consoleError.mockRestore();
     });
 
-    it('should provide initial loading state', () => {
-        const mockFetchData = vi.fn(() => new Promise(() => { })); // Never resolves
+    it('deve fornecer estado inicial de carregamento', () => {
+        const mockFetchData = vi.fn(() => new Promise(() => { })); // Nunca resolve
 
         vi.mocked(services.createGoogleSheetsService).mockReturnValue({
             fetchData: mockFetchData,
@@ -62,19 +62,19 @@ describe('DataContext', () => {
             </DataProvider>
         );
 
-        expect(screen.getByTestId('loading')).toHaveTextContent('Loading');
+        expect(screen.getByTestId('loading')).toHaveTextContent('Carregando');
         expect(screen.getByTestId('records-count')).toHaveTextContent('0');
     });
 
-    it('should fetch and display data successfully', async () => {
+    it('deve buscar e exibir dados com sucesso', async () => {
         const mockRecords: CampaignRecord[] = [
             {
                 id: '1',
                 timestamp: new Date('2024-01-15'),
-                email: 'test@example.com',
-                name: 'Test User',
+                email: 'teste@exemplo.com',
+                name: 'Usuário Teste',
                 phone: '123456789',
-                position: 'Coordinator',
+                position: 'Coordenador',
                 selectedCSR: 'CSR Brasil',
                 csrCSAMap: {},
                 state: 'SP',
@@ -84,9 +84,9 @@ describe('DataContext', () => {
                 activityTime: '14:00',
                 serviceStructure: 'Sub-comitê',
                 activityFormat: 'Presencial',
-                institution: 'Test Institution',
+                institution: 'Instituição Teste',
                 activityType: 'Workshop',
-                activityDescription: 'Test activity',
+                activityDescription: 'Atividade de teste',
                 speakersCount: 2,
                 participantsCount: 10,
                 audienceReached: 50,
@@ -105,7 +105,7 @@ describe('DataContext', () => {
                     calendario: 1,
                     outros: 3
                 },
-                observations: 'Test observation'
+                observations: 'Observação de teste'
             }
         ];
 
@@ -118,7 +118,7 @@ describe('DataContext', () => {
             getConfig: vi.fn()
         } as unknown as GoogleSheetsService);
 
-        // Mock DataParser as a constructor
+        // Mock do DataParser como construtor
         vi.mocked(utils.DataParser).mockImplementation(function (this: { parse: typeof mockParse; extractFilterOptions: ReturnType<typeof vi.fn> }) {
             this.parse = mockParse;
             this.extractFilterOptions = vi.fn();
@@ -131,19 +131,19 @@ describe('DataContext', () => {
             </DataProvider>
         );
 
-        // Wait for data to load
+        // Aguarda os dados carregarem
         await waitFor(() => {
-            expect(screen.getByTestId('loading')).toHaveTextContent('Not Loading');
+            expect(screen.getByTestId('loading')).toHaveTextContent('Não Carregando');
         });
 
         expect(screen.getByTestId('records-count')).toHaveTextContent('1');
-        expect(screen.getByTestId('error')).toHaveTextContent('No Error');
+        expect(screen.getByTestId('error')).toHaveTextContent('Sem Erro');
         expect(mockFetchData).toHaveBeenCalledTimes(1);
         expect(mockParse).toHaveBeenCalledTimes(1);
     });
 
-    it('should handle API errors and display error message', async () => {
-        const mockFetchData = vi.fn().mockRejectedValue(new Error('Network error'));
+    it('deve tratar erros da API e exibir mensagem de erro', async () => {
+        const mockFetchData = vi.fn().mockRejectedValue(new Error('Erro de rede'));
 
         vi.mocked(services.createGoogleSheetsService).mockReturnValue({
             fetchData: mockFetchData,
@@ -151,7 +151,7 @@ describe('DataContext', () => {
             getConfig: vi.fn()
         } as unknown as GoogleSheetsService);
 
-        // Mock DataParser as a constructor
+        // Mock do DataParser como construtor
         vi.mocked(utils.DataParser).mockImplementation(function (this: { parse: ReturnType<typeof vi.fn>; extractFilterOptions: ReturnType<typeof vi.fn> }) {
             this.parse = vi.fn();
             this.extractFilterOptions = vi.fn();
@@ -164,12 +164,12 @@ describe('DataContext', () => {
             </DataProvider>
         );
 
-        // Wait for error state
+        // Aguarda o estado de erro
         await waitFor(() => {
-            expect(screen.getByTestId('loading')).toHaveTextContent('Not Loading');
+            expect(screen.getByTestId('loading')).toHaveTextContent('Não Carregando');
         });
 
-        expect(screen.getByTestId('error')).toHaveTextContent('Network error');
+        expect(screen.getByTestId('error')).toHaveTextContent('Erro de rede');
         expect(screen.getByTestId('records-count')).toHaveTextContent('0');
     });
 });

@@ -1,12 +1,12 @@
 /**
- * DataParser - Transforms raw Google Sheets data into typed CampaignRecord objects
+ * DataParser - Transforma dados brutos do Google Sheets em objetos CampaignRecord tipados
  * 
- * This parser handles:
- * - Converting raw sheet rows to typed domain objects
- * - Parsing dates, numbers, and enums with validation
- * - Handling sparse data (conditional state/city columns)
- * - Extracting CSR/CSA mappings from 12 CSR-specific columns
- * - Graceful error handling for malformed data
+ * Este parser gerencia:
+ * - Conversão de linhas brutas da planilha para objetos de domínio tipados
+ * - Parsing de datas, números e enums com validação
+ * - Tratamento de dados esparsos (colunas condicionais de estado/cidade)
+ * - Extração de mapeamentos CSR/CSA de 12 colunas específicas de CSR
+ * - Tratamento gracioso de erros para dados malformados
  */
 
 import type {
@@ -20,7 +20,7 @@ import type {
 } from '../types';
 
 /**
- * Custom error class for data parsing errors
+ * Classe de erro customizada para erros de parsing de dados
  */
 export class DataParseError extends Error {
     public readonly rowId?: string;
@@ -35,7 +35,7 @@ export class DataParseError extends Error {
 }
 
 /**
- * Brazilian states (all 27 states)
+ * Estados brasileiros (todos os 27 estados)
  */
 const BRAZILIAN_STATES = [
     'AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO',
@@ -44,7 +44,7 @@ const BRAZILIAN_STATES = [
 ] as const;
 
 /**
- * CSR names for mapping
+ * Nomes dos CSRs para mapeamento
  */
 const CSR_NAMES = [
     'CSR 10 Brasil',
@@ -62,46 +62,46 @@ const CSR_NAMES = [
 ] as const;
 
 /**
- * DataParser class for transforming raw sheet data
+ * Classe DataParser para transformar dados brutos da planilha
  */
 export class DataParser {
     private warnings: string[] = [];
 
     /**
-     * Parses raw sheet rows into typed CampaignRecord objects
-     * Skips invalid records and logs warnings
+     * Processa linhas brutas da planilha em objetos CampaignRecord tipados
+     * Ignora registros inválidos e registra avisos
      */
     parse(rows: RawSheetRow[]): CampaignRecord[] {
         this.warnings = [];
         const records: CampaignRecord[] = [];
 
         if (rows.length === 0) {
-            console.warn('DataParser: No rows to parse');
+            console.warn('DataParser: Nenhuma linha para processar');
             return records;
         }
 
-        // Validate schema
+        // Valida o schema
         try {
             this.validateSchema(rows);
         } catch (error) {
-            console.error('DataParser: Schema validation failed', error);
+            console.error('DataParser: Falha na validação do schema', error);
             throw error;
         }
 
-        // Parse each row
+        // Processa cada linha
         for (const row of rows) {
             try {
                 const record = this.parseRow(row);
                 records.push(record);
             } catch (error) {
-                const rowId = row['ID_Resposta'] as string || 'unknown';
+                const rowId = row['ID_Resposta'] as string || 'desconhecido';
                 const message = error instanceof Error ? error.message : String(error);
                 this.warnings.push(`Registro ${rowId}: ${message}`);
-                console.warn(`DataParser: Skipping invalid row ${rowId}`, error);
+                console.warn(`DataParser: Ignorando linha inválida ${rowId}`, error);
             }
         }
 
-        // Log summary if there were warnings
+        // Registra resumo se houver avisos
         if (this.warnings.length > 0) {
             console.warn(
                 `DataParser: ${this.warnings.length} registro(s) foram ignorados devido a dados inválidos.`
@@ -112,14 +112,14 @@ export class DataParser {
     }
 
     /**
-     * Parses a single row into a CampaignRecord
-     * @throws {DataParseError} If required fields are missing or invalid
+     * Processa uma única linha em um CampaignRecord
+     * @throws {DataParseError} Se campos obrigatórios estiverem ausentes ou inválidos
      */
     parseRow(row: RawSheetRow): CampaignRecord {
-        // Validate required fields
+        // Valida campos obrigatórios
         const id = this.getRequiredString(row, 'ID_Resposta');
 
-        // Parse all fields with appropriate error handling
+        // Processa todos os campos com tratamento de erro apropriado
         const timestamp = this.parseDate(row['Carimbo de data/hora']);
         if (!timestamp) {
             throw new DataParseError('Timestamp inválido', id, 'Carimbo de data/hora');
@@ -128,43 +128,43 @@ export class DataParser {
         const selectedCSR = this.getRequiredString(row, 'Selecione o CSR');
         const stateRaw = this.getRequiredString(row, 'Selecione o Estado');
 
-        // Extract state abbreviation from format "State Name (XX)" or just "XX"
+        // Extrai a sigla do estado do formato "Nome do Estado (XX)" ou apenas "XX"
         const state = this.extractStateCode(stateRaw);
 
-        // Validate state
+        // Valida o estado
         if (!state || !BRAZILIAN_STATES.includes(state as typeof BRAZILIAN_STATES[number])) {
             throw new DataParseError(`Estado inválido: ${stateRaw}`, id, 'Selecione o Estado');
         }
 
-        // Parse CSR/CSA mapping
+        // Processa o mapeamento CSR/CSA
         const csrCSAMap = this.parseCSRCSAMap(row);
 
-        // Parse conditional city/neighborhood based on state
+        // Processa cidade/bairro condicionais baseados no estado
         const city = this.parseConditionalCity(row, state);
         const neighborhood = this.parseConditionalNeighborhood(row, state);
 
-        // Parse activity date
+        // Processa a data da atividade
         const activityDate = this.parseDate(row['Data']);
         if (!activityDate) {
             throw new DataParseError('Data da atividade inválida', id, 'Data');
         }
 
-        // Parse service structure
+        // Processa a estrutura de serviço
         const serviceStructure = this.parseServiceStructure(row['Qual Estrutura Prestou Atividade']);
         if (!serviceStructure) {
             throw new DataParseError('Estrutura de serviço inválida', id, 'Qual Estrutura Prestou Atividade');
         }
 
-        // Parse activity format
+        // Processa o formato da atividade
         const activityFormat = this.parseActivityFormat(row['Formato do Atendimento']);
         if (!activityFormat) {
             throw new DataParseError('Formato de atividade inválido', id, 'Formato do Atendimento');
         }
 
-        // Parse materials
+        // Processa os materiais
         const materials = this.parseMaterials(row);
 
-        // Build the complete record
+        // Constrói o registro completo
         const record: CampaignRecord = {
             id,
             timestamp,
@@ -196,7 +196,7 @@ export class DataParser {
     }
 
     /**
-     * Extracts unique filter options from parsed records
+     * Extrai opções de filtro únicas dos registros processados
      */
     extractFilterOptions(records: CampaignRecord[]): FilterOptions {
         const csasSet = new Set<string>();
@@ -206,29 +206,29 @@ export class DataParser {
         const activityTypesSet = new Set<string>();
 
         for (const record of records) {
-            // Add CSR
+            // Adiciona CSR
             if (record.selectedCSR) {
                 csrsSet.add(record.selectedCSR);
             }
 
-            // Add CSAs from the map
+            // Adiciona CSAs do mapa
             Object.values(record.csrCSAMap).forEach(csa => {
                 if (csa) {
                     csasSet.add(csa);
                 }
             });
 
-            // Add state
+            // Adiciona estado
             if (record.state) {
                 statesSet.add(record.state);
             }
 
-            // Add city
+            // Adiciona cidade
             if (record.city) {
                 citiesSet.add(record.city);
             }
 
-            // Add activity type
+            // Adiciona tipo de atividade
             if (record.activityType) {
                 activityTypesSet.add(record.activityType);
             }
@@ -244,18 +244,18 @@ export class DataParser {
     }
 
     /**
-     * Gets warnings from the last parse operation
+     * Retorna os avisos da última operação de parsing
      */
     getWarnings(): string[] {
         return [...this.warnings];
     }
 
     // ========================================================================
-    // Private Helper Methods
+    // Métodos Auxiliares Privados
     // ========================================================================
 
     /**
-     * Validates that required columns exist in the dataset
+     * Valida que as colunas obrigatórias existem no dataset
      */
     private validateSchema(rows: RawSheetRow[]): void {
         const requiredColumns = [
@@ -283,19 +283,19 @@ export class DataParser {
     }
 
     /**
-     * Extracts state code from formats like "Paraná (PR)" or just "PR"
+     * Extrai o código do estado de formatos como "Paraná (PR)" ou apenas "PR"
      */
     private extractStateCode(value: string): string | null {
         if (!value) return null;
 
         const trimmed = value.trim();
 
-        // Check if it's already just the code (2 uppercase letters)
+        // Verifica se já é apenas o código (2 letras maiúsculas)
         if (/^[A-Z]{2}$/.test(trimmed)) {
             return trimmed;
         }
 
-        // Extract from format "State Name (XX)"
+        // Extrai do formato "Nome do Estado (XX)"
         const match = trimmed.match(/\(([A-Z]{2})\)$/);
         if (match) {
             return match[1];
@@ -305,7 +305,7 @@ export class DataParser {
     }
 
     /**
-     * Gets a required string field, throws if missing
+     * Obtém um campo string obrigatório, lança erro se ausente
      */
     private getRequiredString(row: RawSheetRow, field: string): string {
         const value = row[field];
@@ -316,7 +316,7 @@ export class DataParser {
     }
 
     /**
-     * Gets an optional string field
+     * Obtém um campo string opcional
      */
     private getString(row: RawSheetRow, field: string): string | null {
         const value = row[field];
@@ -327,19 +327,19 @@ export class DataParser {
     }
 
     /**
-     * Parses a date from various formats
+     * Processa uma data de vários formatos
      */
     parseDate(value: unknown): Date | null {
         if (!value || value === '') {
             return null;
         }
 
-        // Try parsing as Date object
+        // Tenta processar como objeto Date
         if (value instanceof Date) {
             return isNaN(value.getTime()) ? null : value;
         }
 
-        // Try parsing as string
+        // Tenta processar como string
         const str = String(value).trim();
         const date = new Date(str);
 
@@ -351,22 +351,22 @@ export class DataParser {
     }
 
     /**
-     * Parses a number from various formats
+     * Processa um número de vários formatos
      */
     parseNumber(value: unknown): number | null {
         if (value === null || value === undefined || value === '') {
             return null;
         }
 
-        // If already a number
+        // Se já for um número
         if (typeof value === 'number') {
             return isNaN(value) ? null : value;
         }
 
-        // Try parsing as string
+        // Tenta processar como string
         const str = String(value).trim();
 
-        // Remove common formatting (thousand separators, currency symbols)
+        // Remove formatação comum (separadores de milhar, símbolos de moeda)
         const cleaned = str.replace(/[R$\s.]/g, '').replace(',', '.');
         const num = Number(cleaned);
 
@@ -378,14 +378,14 @@ export class DataParser {
     }
 
     /**
-     * Parses service structure enum with flexible matching
+     * Processa o enum de estrutura de serviço com correspondência flexível
      */
     private parseServiceStructure(value: unknown): ServiceStructure | null {
         if (!value) return null;
 
         const str = String(value).trim().toLowerCase();
 
-        // Map variations to standard values
+        // Mapeia variações para valores padrão
         if (str === 'subcomite' || str === 'sub-comite' || str === 'sub-comitê' || str === 'subcomitê') {
             return 'Sub-comitê';
         }
@@ -403,14 +403,14 @@ export class DataParser {
     }
 
     /**
-     * Parses activity format enum with flexible matching
+     * Processa o enum de formato de atividade com correspondência flexível
      */
     private parseActivityFormat(value: unknown): ActivityFormat | null {
         if (!value) return null;
 
         const str = String(value).trim().toLowerCase();
 
-        // Map variations to standard values
+        // Mapeia variações para valores padrão
         if (str === 'presencial') {
             return 'Presencial';
         }
@@ -428,7 +428,7 @@ export class DataParser {
     }
 
     /**
-     * Parses CSR/CSA mapping from 12 CSR-specific columns
+     * Processa o mapeamento CSR/CSA de 12 colunas específicas de CSR
      */
     private parseCSRCSAMap(row: RawSheetRow): CSRCSAMap {
         const map: CSRCSAMap = {};
@@ -446,10 +446,10 @@ export class DataParser {
     }
 
     /**
-     * Parses conditional city column based on selected state
+     * Processa a coluna condicional de cidade baseada no estado selecionado
      */
     private parseConditionalCity(row: RawSheetRow, state: string): string | null {
-        // Try exact match first
+        // Tenta correspondência exata primeiro
         const exactColumn = `Selecione a cidade - ${state}`;
         let value = this.getString(row, exactColumn);
 
@@ -457,7 +457,7 @@ export class DataParser {
             return value;
         }
 
-        // Try variations with brackets
+        // Tenta variações com colchetes
         const bracketColumn = `Selecione a cidade - [${state}]`;
         value = this.getString(row, bracketColumn);
 
@@ -465,7 +465,7 @@ export class DataParser {
             return value;
         }
 
-        // Try without dash
+        // Tenta sem hífen
         const noDashColumn = `Selecione a cidade ${state}`;
         value = this.getString(row, noDashColumn);
 
@@ -473,10 +473,10 @@ export class DataParser {
     }
 
     /**
-     * Parses conditional neighborhood column based on selected state
+     * Processa a coluna condicional de bairro baseada no estado selecionado
      */
     private parseConditionalNeighborhood(row: RawSheetRow, state: string): string | null {
-        // Try exact match first
+        // Tenta correspondência exata primeiro
         const exactColumn = `Qual o bairro? (${state})`;
         let value = this.getString(row, exactColumn);
 
@@ -484,7 +484,7 @@ export class DataParser {
             return value;
         }
 
-        // Try variations with brackets
+        // Tenta variações com colchetes
         const bracketColumn = `Qual o bairro? [${state}]`;
         value = this.getString(row, bracketColumn);
 
@@ -492,7 +492,7 @@ export class DataParser {
             return value;
         }
 
-        // Try without parentheses
+        // Tenta sem parênteses
         const noParenColumn = `Qual o bairro? ${state}`;
         value = this.getString(row, noParenColumn);
 
@@ -500,7 +500,7 @@ export class DataParser {
     }
 
     /**
-     * Parses materials distributed from multiple columns
+     * Processa os materiais distribuídos de múltiplas colunas
      */
     private parseMaterials(row: RawSheetRow): MaterialsDistributed {
         return {
@@ -521,7 +521,7 @@ export class DataParser {
 }
 
 /**
- * Factory function to create a DataParser instance
+ * Função factory para criar uma instância de DataParser
  */
 export function createDataParser(): DataParser {
     return new DataParser();

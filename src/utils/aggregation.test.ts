@@ -1,5 +1,5 @@
 /**
- * Unit tests for aggregation utilities
+ * Testes unitários para utilitários de agregação
  */
 
 import { describe, it, expect } from 'vitest';
@@ -13,7 +13,7 @@ import {
 } from './aggregation';
 import type { CampaignRecord } from '../types';
 
-// Helper to create a minimal campaign record for testing
+// Função auxiliar para criar um registro de campanha mínimo para testes
 function createMockRecord(overrides: Partial<CampaignRecord> = {}): CampaignRecord {
     return {
         id: '1',
@@ -57,8 +57,9 @@ function createMockRecord(overrides: Partial<CampaignRecord> = {}): CampaignReco
     };
 }
 
+
 describe('calculateSummaryStatistics', () => {
-    it('should return zero statistics for empty array', () => {
+    it('deve retornar estatísticas zeradas para array vazio', () => {
         const stats = calculateSummaryStatistics([]);
 
         expect(stats.activityCount).toBe(0);
@@ -69,7 +70,7 @@ describe('calculateSummaryStatistics', () => {
         expect(stats.totalCost).toBe(0);
     });
 
-    it('should calculate correct totals for single record', () => {
+    it('deve calcular totais corretos para um único registro', () => {
         const record = createMockRecord({
             state: 'SP',
             speakersCount: 3,
@@ -101,7 +102,7 @@ describe('calculateSummaryStatistics', () => {
         expect(stats.totalCost).toBe(150);
     });
 
-    it('should aggregate statistics across multiple records', () => {
+    it('deve agregar estatísticas de múltiplos registros', () => {
         const records = [
             createMockRecord({
                 state: 'SP',
@@ -170,12 +171,12 @@ describe('calculateSummaryStatistics', () => {
         expect(stats.activityCount).toBe(3);
         expect(stats.serversCount).toBe(6); // 2 + 3 + 1
         expect(stats.participantsCount).toBe(45); // 20 + 15 + 10
-        expect(stats.statesCount).toBe(2); // SP and RJ
+        expect(stats.statesCount).toBe(2); // SP e RJ
         expect(stats.totalMaterials).toBe(65); // 10+20 + 5+10+5 + 15
         expect(stats.totalCost).toBe(300); // 100 + 150 + 50
     });
 
-    it('should count unique states correctly', () => {
+    it('deve contar estados únicos corretamente', () => {
         const records = [
             createMockRecord({ state: 'SP' }),
             createMockRecord({ state: 'SP' }),
@@ -190,13 +191,14 @@ describe('calculateSummaryStatistics', () => {
     });
 });
 
+
 describe('rankCitiesByActivityCount', () => {
-    it('should return empty array for empty input', () => {
+    it('deve retornar array vazio para entrada vazia', () => {
         const ranking = rankCitiesByActivityCount([]);
         expect(ranking).toEqual([]);
     });
 
-    it('should rank cities by activity count in descending order', () => {
+    it('deve classificar cidades por contagem de atividades em ordem decrescente', () => {
         const records = [
             createMockRecord({ city: 'São Paulo' }),
             createMockRecord({ city: 'São Paulo' }),
@@ -214,7 +216,7 @@ describe('rankCitiesByActivityCount', () => {
         expect(ranking[2]).toEqual({ name: 'Belo Horizonte', count: 1, rank: 3 });
     });
 
-    it('should ignore records with null city', () => {
+    it('deve ignorar registros com cidade null', () => {
         const records = [
             createMockRecord({ city: 'São Paulo' }),
             createMockRecord({ city: null }),
@@ -229,12 +231,12 @@ describe('rankCitiesByActivityCount', () => {
 });
 
 describe('rankStatesByActivityCount', () => {
-    it('should return empty array for empty input', () => {
+    it('deve retornar array vazio para entrada vazia', () => {
         const ranking = rankStatesByActivityCount([]);
         expect(ranking).toEqual([]);
     });
 
-    it('should rank states by activity count in descending order', () => {
+    it('deve classificar estados por contagem de atividades em ordem decrescente', () => {
         const records = [
             createMockRecord({ state: 'SP' }),
             createMockRecord({ state: 'SP' }),
@@ -253,15 +255,16 @@ describe('rankStatesByActivityCount', () => {
     });
 });
 
+
 describe('aggregateMaterials', () => {
-    it('should return all material types with zero quantities for empty array', () => {
+    it('deve retornar todos os tipos de materiais com quantidades zeradas para array vazio', () => {
         const materials = aggregateMaterials([]);
 
         expect(materials).toHaveLength(12);
         expect(materials.every(m => m.quantity === 0)).toBe(true);
     });
 
-    it('should aggregate materials across multiple records', () => {
+    it('deve agregar materiais de múltiplos registros', () => {
         const records = [
             createMockRecord({
                 materials: {
@@ -308,7 +311,7 @@ describe('aggregateMaterials', () => {
         expect(listaGrupos?.quantity).toBe(15);
     });
 
-    it('should sort materials by quantity in descending order', () => {
+    it('deve ordenar materiais por quantidade em ordem decrescente', () => {
         const records = [
             createMockRecord({
                 materials: {
@@ -330,13 +333,14 @@ describe('aggregateMaterials', () => {
 
         const materials = aggregateMaterials(records);
 
-        // Check that quantities are in descending order
+        // Verifica se as quantidades estão em ordem decrescente
         for (let i = 1; i < materials.length; i++) {
             expect(materials[i].quantity).toBeLessThanOrEqual(materials[i - 1].quantity);
         }
     });
 
-    it('should include all 12 material types with Portuguese labels', () => {
+
+    it('deve incluir todos os 12 tipos de materiais com labels em português', () => {
         const materials = aggregateMaterials([]);
 
         const expectedMaterials = [
@@ -362,37 +366,37 @@ describe('aggregateMaterials', () => {
 });
 
 describe('formatNumber', () => {
-    it('should format integers with thousand separators', () => {
+    it('deve formatar inteiros com separadores de milhar', () => {
         expect(formatNumber(1234567)).toBe('1.234.567');
         expect(formatNumber(1000)).toBe('1.000');
         expect(formatNumber(100)).toBe('100');
     });
 
-    it('should format decimals with specified precision', () => {
+    it('deve formatar decimais com precisão especificada', () => {
         expect(formatNumber(1234.56, 2)).toBe('1.234,56');
         expect(formatNumber(1234.5, 2)).toBe('1.234,50');
     });
 
-    it('should handle zero', () => {
+    it('deve lidar com zero', () => {
         expect(formatNumber(0)).toBe('0');
         expect(formatNumber(0, 2)).toBe('0,00');
     });
 });
 
 describe('formatCurrency', () => {
-    it('should format currency with R$ symbol', () => {
+    it('deve formatar moeda com símbolo R$', () => {
         const formatted = formatCurrency(1234.56);
         expect(formatted).toContain('R$');
         expect(formatted).toContain('1.234,56');
     });
 
-    it('should handle zero', () => {
+    it('deve lidar com zero', () => {
         const formatted = formatCurrency(0);
         expect(formatted).toContain('R$');
         expect(formatted).toContain('0,00');
     });
 
-    it('should handle large amounts', () => {
+    it('deve lidar com valores grandes', () => {
         const formatted = formatCurrency(1234567.89);
         expect(formatted).toContain('R$');
         expect(formatted).toContain('1.234.567,89');

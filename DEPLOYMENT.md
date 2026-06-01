@@ -1,222 +1,222 @@
-# Deployment Guide
+# Guia de Implantação
 
-This guide walks through deploying the ABNA Campaign Dashboard to GitHub Pages.
+Este guia descreve a implantação do Painel de Campanhas da ABNA no GitHub Pages.
 
-## Prerequisites
+## Pré-requisitos
 
-- Repository hosted on GitHub
-- GitHub Pages enabled in repository settings
-- Google Sheets API key with appropriate restrictions
+- Repositório hospedado no GitHub
+- GitHub Pages habilitado nas configurações do repositório
+- Chave da API do Google Sheets com as restrições adequadas
 
-## Initial Setup
+## Configuração Inicial
 
-### 1. Enable GitHub Pages (Manual Setup Required)
+### 1. Habilitar o GitHub Pages (configuração manual necessária)
 
-You need to manually enable GitHub Pages in your repository settings:
+Você precisa habilitar manualmente o GitHub Pages nas configurações do repositório:
 
-1. Go to your repository on GitHub
-2. Click **Settings** (top navigation bar)
-3. Scroll down the left sidebar and click **Pages** (under "Code and automation")
-4. Under "Build and deployment":
-   - **Source**: Select **"GitHub Actions"** from the dropdown
-   - Do NOT select "Deploy from a branch"
-5. The page will auto-save
+1. Acesse seu repositório no GitHub
+2. Clique em **Settings** (barra de navegação superior)
+3. Role a barra lateral esquerda e clique em **Pages** (em "Code and automation")
+4. Em "Build and deployment":
+   - **Source**: Selecione **"GitHub Actions"** no menu suspenso
+   - NÃO selecione "Deploy from a branch"
+5. A página salvará automaticamente
 
-**Important:** This must be done before the first deployment will work.
+**Importante:** Isso deve ser feito antes que a primeira implantação funcione.
 
-### 2. Configure Repository Secrets
+### 2. Configurar os Segredos do Repositório
 
-The following environment variables must be stored as repository secrets:
+As variáveis de ambiente a seguir devem ser armazenadas como segredos do repositório:
 
-1. Go to **Settings** → **Secrets and variables** → **Actions**
-2. Click **New repository secret** for each of the following:
+1. Acesse **Settings** → **Secrets and variables** → **Actions**
+2. Clique em **New repository secret** para cada um dos itens abaixo:
 
-#### Required Secrets:
+#### Segredos obrigatórios:
 
 **VITE_GOOGLE_SHEETS_API_KEY**
-- Your Google Sheets API key
-- Example: `AIzaSyC...`
+- Sua chave da API do Google Sheets
+- Exemplo: `AIzaSyC...`
 
 **VITE_GOOGLE_SHEETS_SPREADSHEET_ID**
-- The ID of your Google Sheets spreadsheet
-- Default: `1X_NnjQTEWJ8Se9Anm5CvD5BIGdjKo5BadYEqnxPnLKY`
-- Example: `1X_NnjQTEWJ8Se9Anm5CvD5BIGdjKo5BadYEqnxPnLKY`
+- O ID da sua planilha do Google Sheets
+- Padrão: `1X_NnjQTEWJ8Se9Anm5CvD5BIGdjKo5BadYEqnxPnLKY`
+- Exemplo: `1X_NnjQTEWJ8Se9Anm5CvD5BIGdjKo5BadYEqnxPnLKY`
 
 **VITE_GOOGLE_SHEETS_RANGE**
-- The range of cells to fetch from the spreadsheet
-- Default: `Sheet1!A:Z`
-- Example: `Sheet1!A:Z` or use the sheet GID format
+- O intervalo de células a ser buscado na planilha
+- Padrão: `Sheet1!A:Z`
+- Exemplo: `Sheet1!A:Z` ou use o formato GID da aba
 
-3. Click **Add secret** for each one
+3. Clique em **Add secret** para cada um
 
-### 3. Configure Google Cloud Console
+### 3. Configurar o Google Cloud Console
 
-Ensure your API key has the following restrictions:
+Garanta que sua chave da API tenha as seguintes restrições:
 
-1. **API restrictions**: Restrict to Google Sheets API only
-2. **Application restrictions**: Add HTTP referrer:
+1. **Restrições de API**: Restrinja apenas à API do Google Sheets
+2. **Restrições de aplicativo**: Adicione o referenciador HTTP:
    - `https://gusnips.github.io/abna-campaign-dashboard/*`
-   - Replace `gusnips` with your GitHub username or organization name
-3. Enable quota monitoring and alerts
+   - Substitua `gusnips` pelo seu nome de usuário ou organização no GitHub
+3. Habilite o monitoramento de cota e os alertas
 
-### 4. Verify Spreadsheet Configuration
+### 4. Verificar a Configuração da Planilha
 
-Ensure the Google Sheets spreadsheet is properly configured:
+Garanta que a planilha do Google Sheets esteja configurada corretamente:
 
-- **Sharing**: "Anyone with the link can view"
-- **Spreadsheet ID**: Should match the `VITE_GOOGLE_SHEETS_SPREADSHEET_ID` secret
-- **Default**: `1X_NnjQTEWJ8Se9Anm5CvD5BIGdjKo5BadYEqnxPnLKY`
-- **Sheet Range**: Should match the `VITE_GOOGLE_SHEETS_RANGE` secret (e.g., `Sheet1!A:Z`)
+- **Compartilhamento**: "Qualquer pessoa com o link pode visualizar"
+- **ID da planilha**: Deve corresponder ao segredo `VITE_GOOGLE_SHEETS_SPREADSHEET_ID`
+- **Padrão**: `1X_NnjQTEWJ8Se9Anm5CvD5BIGdjKo5BadYEqnxPnLKY`
+- **Intervalo da aba**: Deve corresponder ao segredo `VITE_GOOGLE_SHEETS_RANGE` (ex.: `Sheet1!A:Z`)
 
-## Deployment Process
+## Processo de Implantação
 
-### Automatic Deployment
+### Implantação Automática
 
-The application automatically deploys when you push to the `main` branch:
+A aplicação é implantada automaticamente quando você faz push para a branch `main`:
 
 ```bash
 git add .
-git commit -m "Your commit message"
+git commit -m "Sua mensagem de commit"
 git push origin main
 ```
 
-The GitHub Actions workflow will:
-1. Check out the code
-2. Set up Bun
-3. Install dependencies
-4. Build the application
-5. Deploy to GitHub Pages
+O workflow do GitHub Actions irá:
+1. Fazer checkout do código
+2. Configurar o Bun
+3. Instalar as dependências
+4. Gerar o build da aplicação
+5. Implantar no GitHub Pages
 
-### Manual Deployment
+### Implantação Manual
 
-You can also trigger a deployment manually:
+Você também pode acionar uma implantação manualmente:
 
-1. Go to **Actions** tab in your repository
-2. Select "Deploy to GitHub Pages" workflow
-3. Click **Run workflow**
-4. Select the `main` branch
-5. Click **Run workflow**
+1. Acesse a aba **Actions** no seu repositório
+2. Selecione o workflow "Deploy to GitHub Pages"
+3. Clique em **Run workflow**
+4. Selecione a branch `main`
+5. Clique em **Run workflow**
 
-## Local Testing
+## Testes Locais
 
-Before deploying, test the production build locally:
+Antes de implantar, teste o build de produção localmente:
 
 ```bash
-# Build for production
+# Gerar build de produção
 bun run build
 
-# Preview the production build
+# Pré-visualizar o build de produção
 bun run preview
 ```
 
-The preview server will start at `http://localhost:4173` (or another port if 4173 is in use).
+O servidor de pré-visualização iniciará em `http://localhost:4173` (ou em outra porta, caso a 4173 esteja em uso).
 
-## Verification
+## Verificação
 
-After deployment completes:
+Após a conclusão da implantação:
 
-1. Check the **Actions** tab for workflow status
-2. Visit your deployed site: `https://gusnips.github.io/abna-campaign-dashboard/`
-3. Verify:
-   - Data loads from Google Sheets
-   - All filters work correctly
-   - Charts render properly
-   - Mobile responsive layout works
-   - No console errors
+1. Verifique o status do workflow na aba **Actions**
+2. Acesse o site implantado: `https://gusnips.github.io/abna-campaign-dashboard/`
+3. Confira:
+   - Os dados carregam a partir do Google Sheets
+   - Todos os filtros funcionam corretamente
+   - Os gráficos são renderizados corretamente
+   - O layout responsivo funciona em dispositivos móveis
+   - Não há erros no console
 
-## Troubleshooting
+## Solução de Problemas
 
-### "Get Pages site failed" Error
+### Erro "Get Pages site failed"
 
-If you see this error on first deployment:
+Se você vir este erro na primeira implantação:
 ```
 Error: Get Pages site failed. Please verify that the repository has Pages enabled...
 ```
 
-**Solution:** The workflow now automatically enables GitHub Pages. This error should only occur once on the first deployment attempt. Simply:
+**Solução:** O workflow agora habilita o GitHub Pages automaticamente. Esse erro só deve ocorrer uma vez, na primeira tentativa de implantação. Basta:
 
-1. Re-run the failed workflow (click "Re-run all jobs" in the Actions tab)
-2. Or push another commit to trigger a new deployment
+1. Reexecutar o workflow que falhou (clique em "Re-run all jobs" na aba Actions)
+2. Ou fazer push de outro commit para acionar uma nova implantação
 
-The workflow will automatically enable GitHub Pages on the next run.
+O workflow habilitará o GitHub Pages automaticamente na próxima execução.
 
-### Build Fails
+### Falha no Build
 
-- Check the Actions log for specific error messages
-- Ensure all dependencies are listed in `package.json`
-- Verify TypeScript compilation passes locally: `bun run build`
+- Verifique o log da aba Actions para mensagens de erro específicas
+- Garanta que todas as dependências estejam listadas no `package.json`
+- Verifique se a compilação TypeScript passa localmente: `bun run build`
 
-### API Key Issues
+### Problemas com a Chave da API
 
-- Verify all three secrets are configured:
+- Verifique se os três segredos estão configurados:
   - `VITE_GOOGLE_SHEETS_API_KEY`
   - `VITE_GOOGLE_SHEETS_SPREADSHEET_ID`
   - `VITE_GOOGLE_SHEETS_RANGE`
-- Check API key restrictions in Google Cloud Console
-- Ensure the spreadsheet is publicly accessible
+- Verifique as restrições da chave da API no Google Cloud Console
+- Garanta que a planilha esteja acessível publicamente
 
-### 404 Errors on Deployed Site
+### Erros 404 no Site Implantado
 
-- Verify the `base` path in `vite.config.ts` matches your repository name
-- Check that GitHub Pages is enabled and set to "GitHub Actions"
-- Ensure the workflow completed successfully
+- Verifique se o caminho `base` em `vite.config.ts` corresponde ao nome do seu repositório
+- Confira se o GitHub Pages está habilitado e definido como "GitHub Actions"
+- Garanta que o workflow tenha concluído com sucesso
 
-### Data Not Loading
+### Dados Não Carregam
 
-- Check browser console for API errors
-- Verify all three environment variables are set correctly:
-  - API key has correct permissions
-  - Spreadsheet ID matches your Google Sheet
-  - Range covers all necessary columns (e.g., `Sheet1!A:Z`)
-- Ensure spreadsheet is publicly accessible
-- Check API quota limits in Google Cloud Console
+- Verifique o console do navegador em busca de erros da API
+- Confira se as três variáveis de ambiente estão definidas corretamente:
+  - A chave da API tem as permissões corretas
+  - O ID da planilha corresponde à sua planilha do Google
+  - O intervalo cobre todas as colunas necessárias (ex.: `Sheet1!A:Z`)
+- Garanta que a planilha esteja acessível publicamente
+- Verifique os limites de cota da API no Google Cloud Console
 
-## Configuration Files
+## Arquivos de Configuração
 
-Key files for deployment:
+Arquivos importantes para a implantação:
 
-- `.github/workflows/deploy.yml` - GitHub Actions workflow
-- `vite.config.ts` - Vite configuration with base path
-- `.env.example` - Environment variable template
-- `package.json` - Build scripts and dependencies
+- `.github/workflows/deploy.yml` - Workflow do GitHub Actions
+- `vite.config.ts` - Configuração do Vite com o caminho base
+- `.env.example` - Modelo de variáveis de ambiente
+- `package.json` - Scripts de build e dependências
 
-## Updating the Deployment
+## Atualizando a Implantação
 
-To update the deployed application:
+Para atualizar a aplicação implantada:
 
-1. Make your changes locally
-2. Test with `bun run dev`
-3. Run tests: `bun run test:run`
-4. Build locally: `bun run build`
-5. Commit and push to `main` branch
-6. GitHub Actions will automatically deploy the update
+1. Faça suas alterações localmente
+2. Teste com `bun run dev`
+3. Execute os testes: `bun run test:run`
+4. Gere o build localmente: `bun run build`
+5. Faça commit e push para a branch `main`
+6. O GitHub Actions implantará a atualização automaticamente
 
-## Rollback
+## Reversão (Rollback)
 
-To rollback to a previous version:
+Para reverter para uma versão anterior:
 
-1. Go to **Actions** tab
-2. Find the successful deployment you want to rollback to
-3. Click **Re-run all jobs**
+1. Acesse a aba **Actions**
+2. Encontre a implantação bem-sucedida para a qual deseja reverter
+3. Clique em **Re-run all jobs**
 
-Alternatively, revert the commit and push:
+Como alternativa, reverta o commit e faça push:
 
 ```bash
-git revert <commit-hash>
+git revert <hash-do-commit>
 git push origin main
 ```
 
-## Monitoring
+## Monitoramento
 
-Monitor your deployment:
+Monitore sua implantação:
 
-- **GitHub Actions**: Check workflow runs in the Actions tab
-- **Google Cloud Console**: Monitor API usage and quotas
-- **Browser Console**: Check for runtime errors on the deployed site
+- **GitHub Actions**: Acompanhe as execuções do workflow na aba Actions
+- **Google Cloud Console**: Monitore o uso e as cotas da API
+- **Console do navegador**: Verifique erros de execução no site implantado
 
-## Support
+## Suporte
 
-For issues with:
-- **GitHub Pages**: Check [GitHub Pages documentation](https://docs.github.com/en/pages)
-- **Google Sheets API**: Check [Google Sheets API documentation](https://developers.google.com/sheets/api)
-- **Vite**: Check [Vite documentation](https://vitejs.dev/)
+Para problemas com:
+- **GitHub Pages**: Consulte a [documentação do GitHub Pages](https://docs.github.com/en/pages)
+- **API do Google Sheets**: Consulte a [documentação da API do Google Sheets](https://developers.google.com/sheets/api)
+- **Vite**: Consulte a [documentação do Vite](https://vitejs.dev/)

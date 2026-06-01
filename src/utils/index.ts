@@ -1,5 +1,5 @@
 /**
- * Utility functions and classes for data processing
+ * Funções utilitárias e classes para processamento de dados
  */
 
 export { DataParser, DataParseError, createDataParser } from './DataParser';
@@ -9,6 +9,17 @@ export {
     rankCitiesByActivityCount,
     rankStatesByActivityCount,
     aggregateMaterials,
+    countByField,
+    extractHourBucket,
+    aggregateByHour,
+    rankCSRsByActivityCount,
+    rankCSRsByAudienceReached,
+    rankCSAsByActivityCount,
+    filterRecordsByCSR,
+    countCSAsForCSR,
+    aggregateCSABreakdown,
     formatNumber,
     formatCurrency,
 } from './aggregation';
+
+export { csrToSlug, slugToCSR } from './slug';

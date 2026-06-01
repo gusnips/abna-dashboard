@@ -1,15 +1,15 @@
 /**
- * GoogleSheetsService - Handles data fetching from Google Sheets API v4
+ * GoogleSheetsService - Gerencia a busca de dados da API do Google Sheets v4
  * 
- * This service provides read-only access to a public Google Sheets spreadsheet
- * containing ABNA campaign data. It includes configuration validation, error
- * handling, and descriptive error messages.
+ * Este serviço fornece acesso somente leitura a uma planilha pública do Google Sheets
+ * contendo dados de campanhas da ABNA. Inclui validação de configuração, tratamento
+ * de erros e mensagens de erro descritivas.
  */
 
 import type { GoogleSheetsConfig, RawSheetRow } from '../types';
 
 /**
- * Custom error class for Google Sheets API errors
+ * Classe de erro customizada para erros da API do Google Sheets
  */
 export class GoogleSheetsError extends Error {
     public readonly statusCode?: number;
@@ -28,7 +28,7 @@ export class GoogleSheetsError extends Error {
 }
 
 /**
- * Service class for fetching data from Google Sheets API
+ * Classe de serviço para buscar dados da API do Google Sheets
  */
 export class GoogleSheetsService {
     private config: GoogleSheetsConfig;
@@ -40,42 +40,42 @@ export class GoogleSheetsService {
     }
 
     /**
-     * Validates the Google Sheets configuration
-     * @throws {GoogleSheetsError} If configuration is invalid
+     * Valida a configuração do Google Sheets
+     * @throws {GoogleSheetsError} Se a configuração for inválida
      */
     validateConfig(): void {
         const { apiKey, spreadsheetId, range } = this.config;
 
         if (!apiKey || apiKey.trim() === '') {
             throw new GoogleSheetsError(
-                'API key is required. Please set VITE_GOOGLE_SHEETS_API_KEY in your .env file.'
+                'A chave da API é obrigatória. Defina VITE_GOOGLE_SHEETS_API_KEY no seu arquivo .env.'
             );
         }
 
         if (!spreadsheetId || spreadsheetId.trim() === '') {
             throw new GoogleSheetsError(
-                'Spreadsheet ID is required. Please set VITE_GOOGLE_SHEETS_SPREADSHEET_ID in your .env file.'
+                'O ID da planilha é obrigatório. Defina VITE_GOOGLE_SHEETS_SPREADSHEET_ID no seu arquivo .env.'
             );
         }
 
         if (!range || range.trim() === '') {
             throw new GoogleSheetsError(
-                'Range is required. Please set VITE_GOOGLE_SHEETS_RANGE in your .env file.'
+                'O intervalo é obrigatório. Defina VITE_GOOGLE_SHEETS_RANGE no seu arquivo .env.'
             );
         }
 
-        // Validate API key format (basic check)
+        // Validação básica do formato da chave da API
         if (apiKey.length < 20) {
             throw new GoogleSheetsError(
-                'API key appears to be invalid. Please check your VITE_GOOGLE_SHEETS_API_KEY.'
+                'A chave da API parece ser inválida. Verifique VITE_GOOGLE_SHEETS_API_KEY.'
             );
         }
     }
 
     /**
-     * Fetches data from Google Sheets API
-     * @returns Promise resolving to array of raw sheet rows
-     * @throws {GoogleSheetsError} If fetch fails or API returns an error
+     * Busca dados da API do Google Sheets
+     * @returns Promise que resolve para um array de linhas brutas da planilha
+     * @throws {GoogleSheetsError} Se a busca falhar ou a API retornar um erro
      */
     async fetchData(): Promise<RawSheetRow[]> {
         const { spreadsheetId, range, apiKey } = this.config;
@@ -84,7 +84,7 @@ export class GoogleSheetsService {
         try {
             const response = await fetch(url);
 
-            // Handle HTTP errors
+            // Trata erros HTTP
             if (!response.ok) {
                 const errorData = await this.parseErrorResponse(response);
                 throw new GoogleSheetsError(
@@ -96,22 +96,22 @@ export class GoogleSheetsService {
 
             const data = await response.json();
 
-            // Validate response structure
+            // Valida a estrutura da resposta
             if (!data.values || !Array.isArray(data.values)) {
                 throw new GoogleSheetsError(
                     'Resposta da API inválida: dados não encontrados.'
                 );
             }
 
-            // Convert to RawSheetRow format
+            // Converte para o formato RawSheetRow
             return this.transformToRows(data.values);
         } catch (error) {
-            // Re-throw GoogleSheetsError as-is
+            // Re-lança GoogleSheetsError como está
             if (error instanceof GoogleSheetsError) {
                 throw error;
             }
 
-            // Handle network errors
+            // Trata erros de rede
             if (error instanceof TypeError && error.message.includes('fetch')) {
                 throw new GoogleSheetsError(
                     'Erro de rede: não foi possível conectar à API do Google Sheets. Verifique sua conexão com a internet.',
@@ -120,7 +120,7 @@ export class GoogleSheetsService {
                 );
             }
 
-            // Handle other unexpected errors
+            // Trata outros erros inesperados
             throw new GoogleSheetsError(
                 'Erro inesperado ao buscar dados: ' + (error instanceof Error ? error.message : String(error)),
                 undefined,
@@ -130,7 +130,7 @@ export class GoogleSheetsService {
     }
 
     /**
-     * Parses error response from Google Sheets API
+     * Processa a resposta de erro da API do Google Sheets
      */
     private async parseErrorResponse(response: Response): Promise<unknown> {
         try {
@@ -141,7 +141,7 @@ export class GoogleSheetsService {
     }
 
     /**
-     * Gets user-friendly error message based on status code
+     * Retorna mensagem de erro amigável baseada no código de status
      */
     private getErrorMessage(statusCode: number, errorData: unknown): string {
         switch (statusCode) {
@@ -165,7 +165,7 @@ export class GoogleSheetsService {
     }
 
     /**
-     * Extracts error message from API error response
+     * Extrai a mensagem de erro da resposta de erro da API
      */
     private extractErrorMessage(errorData: unknown): string {
         if (typeof errorData === 'object' && errorData !== null) {
@@ -184,35 +184,35 @@ export class GoogleSheetsService {
     }
 
     /**
-     * Transforms Google Sheets values array to RawSheetRow objects
-     * First row is treated as headers, subsequent rows as data
+     * Transforma o array de valores do Google Sheets em objetos RawSheetRow
+     * A primeira linha é tratada como cabeçalhos, as linhas seguintes como dados
      */
     private transformToRows(values: unknown[][]): RawSheetRow[] {
         if (values.length === 0) {
             return [];
         }
 
-        // First row contains headers
+        // A primeira linha contém os cabeçalhos
         const headers = values[0] as string[];
         const rows: RawSheetRow[] = [];
 
-        // Process data rows (skip header row)
+        // Processa as linhas de dados (pula a linha de cabeçalho)
         for (let i = 1; i < values.length; i++) {
             const row = values[i];
             const rowObject: RawSheetRow = {};
 
-            // Map each cell to its corresponding header
+            // Mapeia cada célula para seu cabeçalho correspondente
             for (let j = 0; j < headers.length; j++) {
                 const header = headers[j];
                 const value = row[j];
 
-                // Convert empty strings to null
+                // Converte strings vazias para null
                 if (value === '' || value === undefined) {
                     rowObject[header] = null;
                 } else if (typeof value === 'string' || typeof value === 'number') {
                     rowObject[header] = value;
                 } else {
-                    // Convert other types to string
+                    // Converte outros tipos para string
                     rowObject[header] = String(value);
                 }
             }
@@ -224,19 +224,19 @@ export class GoogleSheetsService {
     }
 
     /**
-     * Gets the current configuration (useful for debugging)
+     * Retorna a configuração atual (útil para debug)
      */
     getConfig(): Readonly<GoogleSheetsConfig> {
         return {
             ...this.config,
-            // Mask API key for security
+            // Mascara a chave da API por segurança
             apiKey: this.config.apiKey.substring(0, 8) + '...'
         };
     }
 }
 
 /**
- * Factory function to create GoogleSheetsService from environment variables
+ * Função factory para criar GoogleSheetsService a partir de variáveis de ambiente
  */
 export function createGoogleSheetsService(): GoogleSheetsService {
     const config: GoogleSheetsConfig = {

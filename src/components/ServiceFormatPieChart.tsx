@@ -1,53 +1,39 @@
 /**
- * ServiceStructurePieChart - Exibe distribuição de estrutura de serviço
- * 
- * Mostra um gráfico de pizza de atividades por tipo de estrutura de serviço:
- * - Sub-comitê
- * - Oficina
- * - Área
- * - Outros
- * 
- * Requisitos: 3.1, 3.5, 3.6
+ * ServiceFormatPieChart - Exibe distribuição de formato de atendimento
+ *
+ * Mostra um gráfico de pizza de atividades por formato de atendimento (activityFormat):
+ * - Presencial
+ * - Híbrido
+ * - Virtual
+ * - Online
  */
 
 import { useMemo } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import { useFilters } from '../contexts/FilterContext';
+import { countByField } from '../utils';
 import { ChartGradients } from './ChartGradients';
 import { CHART_COLORS } from './chartTheme';
 import type { ChartData } from '../types';
 
 /**
- * Componente ServiceStructurePieChart
+ * Componente ServiceFormatPieChart
  */
-export function ServiceStructurePieChart() {
+export function ServiceFormatPieChart() {
     const { filteredRecords } = useFilters();
 
     /**
-     * Agrega dados pelo campo serviceStructure
+     * Agrega dados pelo campo activityFormat
      */
     const chartData = useMemo((): ChartData[] => {
-        const structureCountMap = new Map<string, number>();
-
-        // Conta atividades por estrutura de serviço
-        for (const record of filteredRecords) {
-            const structure = record.serviceStructure;
-            const count = structureCountMap.get(structure) || 0;
-            structureCountMap.set(structure, count + 1);
-        }
-
-        // Converte para formato de dados do gráfico
-        return Array.from(structureCountMap.entries()).map(([name, value]) => ({
-            name,
-            value,
-        }));
+        return countByField(filteredRecords, (record) => record.activityFormat);
     }, [filteredRecords]);
 
     // Gerencia estado de dados vazio
     if (chartData.length === 0) {
         return (
             <div className="chart-container">
-                <h3 className="chart-title">Estrutura de Serviço</h3>
+                <h3 className="chart-title">Formato de Atendimento</h3>
                 <div className="chart-empty-state">
                     <p className="chart-empty-text">Nenhum dado disponível</p>
                 </div>
@@ -57,7 +43,7 @@ export function ServiceStructurePieChart() {
 
     return (
         <div className="chart-container">
-            <h3 className="chart-title">Estrutura de Serviço</h3>
+            <h3 className="chart-title">Formato de Atendimento</h3>
             <ResponsiveContainer width="100%" height={300}>
                 <PieChart>
                     <ChartGradients />

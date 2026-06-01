@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom'
 import { beforeEach } from 'vitest'
 
-// Mock sessionStorage for tests
+// Mock do sessionStorage para testes
 const createSessionStorageMock = () => {
     let store: Record<string, string> = {};
 
@@ -26,7 +26,7 @@ const createSessionStorageMock = () => {
     };
 };
 
-// Set up sessionStorage mock
+// Configura o mock do sessionStorage
 if (typeof window !== 'undefined' && !window.sessionStorage) {
     Object.defineProperty(window, 'sessionStorage', {
         value: createSessionStorageMock(),
@@ -34,7 +34,7 @@ if (typeof window !== 'undefined' && !window.sessionStorage) {
     });
 }
 
-// Also set it on globalThis for Node environment
+// Também define no globalThis para ambiente Node
 if (typeof globalThis !== 'undefined' && !(globalThis as { sessionStorage?: Storage }).sessionStorage) {
     Object.defineProperty(globalThis, 'sessionStorage', {
         value: createSessionStorageMock(),
@@ -42,7 +42,7 @@ if (typeof globalThis !== 'undefined' && !(globalThis as { sessionStorage?: Stor
     });
 }
 
-// Clear sessionStorage before each test
+// Limpa o sessionStorage antes de cada teste
 beforeEach(() => {
     if (typeof sessionStorage !== 'undefined') {
         sessionStorage.clear();

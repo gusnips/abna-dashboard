@@ -1,5 +1,5 @@
 /**
- * React contexts for state management
+ * Contextos React para gerenciamento de estado
  */
 
 export { DataProvider, useData, DataContext } from './DataContext';

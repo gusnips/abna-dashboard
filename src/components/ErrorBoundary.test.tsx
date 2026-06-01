@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import ErrorBoundary from './ErrorBoundary';
 
-// Component that throws an error for testing
+// Componente que lança um erro para testes
 const ThrowError = ({ shouldThrow }: { shouldThrow: boolean }) => {
     if (shouldThrow) {
         throw new Error('Test error');
@@ -11,7 +11,7 @@ const ThrowError = ({ shouldThrow }: { shouldThrow: boolean }) => {
 };
 
 describe('ErrorBoundary', () => {
-    // Suppress console.error for these tests
+    // Suprime console.error para estes testes
     const originalError = console.error;
     beforeEach(() => {
         console.error = vi.fn();
@@ -20,7 +20,7 @@ describe('ErrorBoundary', () => {
         console.error = originalError;
     });
 
-    it('should render children when there is no error', () => {
+    it('deve renderizar children quando não há erro', () => {
         render(
             <ErrorBoundary>
                 <div>Test content</div>
@@ -29,7 +29,7 @@ describe('ErrorBoundary', () => {
         expect(screen.getByText('Test content')).toBeInTheDocument();
     });
 
-    it('should display error message in Portuguese when error occurs', () => {
+    it('deve exibir mensagem de erro em português quando ocorre erro', () => {
         render(
             <ErrorBoundary>
                 <ThrowError shouldThrow={true} />
@@ -40,7 +40,7 @@ describe('ErrorBoundary', () => {
         expect(screen.getByText(/Desculpe, ocorreu um erro inesperado/)).toBeInTheDocument();
     });
 
-    it('should display reload button when error occurs', () => {
+    it('deve exibir botão de recarregar quando ocorre erro', () => {
         render(
             <ErrorBoundary>
                 <ThrowError shouldThrow={true} />
@@ -50,7 +50,7 @@ describe('ErrorBoundary', () => {
         expect(screen.getByText('Recarregar Página')).toBeInTheDocument();
     });
 
-    it('should display error details when error occurs', () => {
+    it('deve exibir detalhes do erro quando ocorre erro', () => {
         render(
             <ErrorBoundary>
                 <ThrowError shouldThrow={true} />

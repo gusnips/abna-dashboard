@@ -1,96 +1,96 @@
-# GitHub Secrets Setup Guide
+# Guia de Configuração dos Segredos do GitHub
 
-Before deploying to GitHub Pages, you need to configure three repository secrets.
+Antes de implantar no GitHub Pages, você precisa configurar três segredos do repositório.
 
-## Quick Setup Steps
+## Passos Rápidos de Configuração
 
-1. Go to your GitHub repository
-2. Navigate to **Settings** → **Secrets and variables** → **Actions**
-3. Click **New repository secret** for each secret below
+1. Acesse seu repositório no GitHub
+2. Navegue até **Settings** → **Secrets and variables** → **Actions**
+3. Clique em **New repository secret** para cada segredo abaixo
 
-## Required Secrets
+## Segredos Obrigatórios
 
 ### 1. VITE_GOOGLE_SHEETS_API_KEY
-**Name:** `VITE_GOOGLE_SHEETS_API_KEY`  
-**Value:** Your Google Sheets API key from Google Cloud Console  
-**Example:** `AIzaSyC...` (your actual API key)
+**Nome:** `VITE_GOOGLE_SHEETS_API_KEY`  
+**Valor:** Sua chave da API do Google Sheets, obtida no Google Cloud Console  
+**Exemplo:** `AIzaSyC...` (sua chave de API real)
 
-**How to get this:**
-- Go to [Google Cloud Console](https://console.cloud.google.com/)
-- Enable Google Sheets API
-- Create credentials → API Key
-- Restrict the key to Google Sheets API only
-- Add HTTP referrer restriction: `https://gusnips.github.io/*`
+**Como obter:**
+- Acesse o [Google Cloud Console](https://console.cloud.google.com/)
+- Habilite a API do Google Sheets
+- Crie credenciais → Chave de API
+- Restrinja a chave apenas à API do Google Sheets
+- Adicione a restrição de referenciador HTTP: `https://gusnips.github.io/*`
 
 ---
 
 ### 2. VITE_GOOGLE_SHEETS_SPREADSHEET_ID
-**Name:** `VITE_GOOGLE_SHEETS_SPREADSHEET_ID`  
-**Value:** `1X_NnjQTEWJ8Se9Anm5CvD5BIGdjKo5BadYEqnxPnLKY`
+**Nome:** `VITE_GOOGLE_SHEETS_SPREADSHEET_ID`  
+**Valor:** `1X_NnjQTEWJ8Se9Anm5CvD5BIGdjKo5BadYEqnxPnLKY`
 
-**How to get this:**
-- Open your Google Sheet
-- Look at the URL: `https://docs.google.com/spreadsheets/d/SPREADSHEET_ID/edit`
-- Copy the `SPREADSHEET_ID` part
-- For this project, use: `1X_NnjQTEWJ8Se9Anm5CvD5BIGdjKo5BadYEqnxPnLKY`
+**Como obter:**
+- Abra sua planilha do Google
+- Observe a URL: `https://docs.google.com/spreadsheets/d/SPREADSHEET_ID/edit`
+- Copie a parte `SPREADSHEET_ID`
+- Para este projeto, use: `1X_NnjQTEWJ8Se9Anm5CvD5BIGdjKo5BadYEqnxPnLKY`
 
 ---
 
 ### 3. VITE_GOOGLE_SHEETS_RANGE
-**Name:** `VITE_GOOGLE_SHEETS_RANGE`  
-**Value:** `Sheet1!A:Z`
+**Nome:** `VITE_GOOGLE_SHEETS_RANGE`  
+**Valor:** `Sheet1!A:Z`
 
-**What this means:**
-- `Sheet1` = the name of the sheet tab
-- `A:Z` = columns A through Z (all rows)
-- Adjust if your sheet has a different name or you need different columns
+**O que isso significa:**
+- `Sheet1` = o nome da aba da planilha
+- `A:Z` = colunas de A até Z (todas as linhas)
+- Ajuste se a sua planilha tiver um nome diferente ou se você precisar de outras colunas
 
 ---
 
-## Verification Checklist
+## Lista de Verificação
 
-After adding all three secrets:
+Após adicionar os três segredos:
 
-- [ ] `VITE_GOOGLE_SHEETS_API_KEY` is set
-- [ ] `VITE_GOOGLE_SHEETS_SPREADSHEET_ID` is set
-- [ ] `VITE_GOOGLE_SHEETS_RANGE` is set
-- [ ] Google Sheet is set to "Anyone with the link can view"
-- [ ] API key has HTTP referrer restrictions configured
-- [ ] **GitHub Pages is enabled** (Settings → Pages → Source: GitHub Actions)
+- [ ] `VITE_GOOGLE_SHEETS_API_KEY` está definido
+- [ ] `VITE_GOOGLE_SHEETS_SPREADSHEET_ID` está definido
+- [ ] `VITE_GOOGLE_SHEETS_RANGE` está definido
+- [ ] A planilha do Google está configurada como "Qualquer pessoa com o link pode visualizar"
+- [ ] A chave da API tem as restrições de referenciador HTTP configuradas
+- [ ] **O GitHub Pages está habilitado** (Settings → Pages → Source: GitHub Actions)
 
-**Important:** You must manually enable GitHub Pages in Settings before the workflow will work.
+**Importante:** Você precisa habilitar manualmente o GitHub Pages em Settings antes que o workflow funcione.
 
-## Testing
+## Testando
 
-After setting up secrets, push to main branch:
+Após configurar os segredos, faça push para a branch main:
 
 ```bash
 git add .
-git commit -m "Configure deployment"
+git commit -m "Configurar implantação"
 git push origin main
 ```
 
-Then check:
-1. **Actions** tab - workflow should run successfully
-2. Visit `https://gusnips.github.io/abna-campaign-dashboard/`
-3. Data should load from Google Sheets
+Em seguida, verifique:
+1. Aba **Actions** - o workflow deve executar com sucesso
+2. Acesse `https://gusnips.github.io/abna-campaign-dashboard/`
+3. Os dados devem carregar a partir do Google Sheets
 
-## Troubleshooting
+## Solução de Problemas
 
-**Build fails with "API key not found"**
-- Check that secret names are exactly as shown above (case-sensitive)
-- Verify secrets are in the correct repository
+**O build falha com "API key not found"**
+- Verifique se os nomes dos segredos estão exatamente como mostrado acima (diferencia maiúsculas de minúsculas)
+- Confira se os segredos estão no repositório correto
 
-**Data doesn't load on deployed site**
-- Check browser console for errors
-- Verify spreadsheet is publicly accessible
-- Check API key restrictions in Google Cloud Console
+**Os dados não carregam no site implantado**
+- Verifique o console do navegador em busca de erros
+- Confira se a planilha está acessível publicamente
+- Verifique as restrições da chave da API no Google Cloud Console
 
-**404 error on deployed site**
-- Verify GitHub Pages is enabled
-- Check that `base` in `vite.config.ts` matches your repo name
-- Wait a few minutes for DNS propagation
+**Erro 404 no site implantado**
+- Confira se o GitHub Pages está habilitado
+- Verifique se o `base` em `vite.config.ts` corresponde ao nome do seu repositório
+- Aguarde alguns minutos para a propagação do DNS
 
-## Need Help?
+## Precisa de Ajuda?
 
-See the full [DEPLOYMENT.md](./DEPLOYMENT.md) guide for detailed instructions.
+Consulte o guia completo [DEPLOYMENT.md](./DEPLOYMENT.md) para instruções detalhadas.

@@ -1,11 +1,11 @@
 /**
- * FilterContext - Manages filter state and provides filtered data
+ * FilterContext - Gerencia o estado dos filtros e fornece dados filtrados
  * 
- * This context manages all filtering logic including:
- * - Geographic filters (Brasil/CSA/Region/State/City) with mutual exclusivity
- * - Date range filtering
- * - Filter options extraction from data
- * - Filtered records computation
+ * Este contexto gerencia toda a lógica de filtragem incluindo:
+ * - Filtros geográficos (Brasil/CSA/Região/Estado/Cidade) com exclusividade mútua
+ * - Filtragem por intervalo de datas
+ * - Extração de opções de filtro dos dados
+ * - Cálculo de registros filtrados
  */
 
 import { createContext, useContext, useState, useMemo, useCallback } from 'react';
@@ -20,20 +20,26 @@ import type {
 import { useData } from './DataContext';
 
 /**
- * Create the FilterContext with undefined default value
- * This forces consumers to use the context within a provider
+ * Cria o FilterContext com valor padrão undefined
+ * Isso força os consumidores a usar o contexto dentro de um provider
  */
 const FilterContext = createContext<FilterContextValue | undefined>(undefined);
 
 /**
- * Props for FilterProvider component
+ * Props para o componente FilterProvider
  */
 interface FilterProviderProps {
     children: ReactNode;
+    /**
+     * Filtro parcial opcional para inicializar o estado. Útil para visualizações
+     * com escopo definido (ex.: relatório de CSR fixado em uma região). Mesclado
+     * sobre o estado padrão limpo.
+     */
+    initialFilter?: Partial<FilterState>;
 }
 
 /**
- * Initial filter state - all filters cleared
+ * Estado inicial dos filtros - todos os filtros limpos
  */
 const createInitialFilterState = (): FilterState => ({
     geographicScope: 'brasil',
@@ -48,14 +54,17 @@ const createInitialFilterState = (): FilterState => ({
 });
 
 /**
- * FilterProvider component that manages filter state and filtered data
+ * Componente FilterProvider que gerencia o estado dos filtros e dados filtrados
  */
-export function FilterProvider({ children }: FilterProviderProps) {
+export function FilterProvider({ children, initialFilter }: FilterProviderProps) {
     const { records } = useData();
-    const [filters, setFilters] = useState<FilterState>(createInitialFilterState());
+    const [filters, setFilters] = useState<FilterState>(() => ({
+        ...createInitialFilterState(),
+        ...initialFilter
+    }));
 
     /**
-     * Extract filter options from available records
+     * Extrai opções de filtro dos registros disponíveis
      */
     const filterOptions = useMemo((): FilterOptions => {
         const csasSet = new Set<string>();
@@ -65,29 +74,29 @@ export function FilterProvider({ children }: FilterProviderProps) {
         const activityTypesSet = new Set<string>();
 
         records.forEach(record => {
-            // Extract CSRs
+            // Extrai CSRs
             if (record.selectedCSR) {
                 csrsSet.add(record.selectedCSR);
             }
 
-            // Extract CSAs from the CSR-CSA map
+            // Extrai CSAs do mapa CSR-CSA
             Object.values(record.csrCSAMap).forEach(csa => {
                 if (csa) {
                     csasSet.add(csa);
                 }
             });
 
-            // Extract states
+            // Extrai estados
             if (record.state) {
                 statesSet.add(record.state);
             }
 
-            // Extract cities
+            // Extrai cidades
             if (record.city) {
                 citiesSet.add(record.city);
             }
 
-            // Extract activity types
+            // Extrai tipos de atividade
             if (record.activityType) {
                 activityTypesSet.add(record.activityType);
             }
@@ -103,12 +112,12 @@ export function FilterProvider({ children }: FilterProviderProps) {
     }, [records]);
 
     /**
-     * Set geographic filter with mutual exclusivity logic
-     * When a geographic scope is selected, all other geographic filters are cleared
+     * Define filtro geográfico com lógica de exclusividade mútua
+     * Quando um escopo geográfico é selecionado, todos os outros filtros geográficos são limpos
      */
     const setGeographicFilter = useCallback((scope: GeographicScope, value: string | null): void => {
         setFilters(prev => {
-            // Create new filter state with all geographic filters cleared
+            // Cria novo estado de filtro com todos os filtros geográficos limpos
             const newFilters: FilterState = {
                 ...prev,
                 geographicScope: scope,
@@ -118,10 +127,10 @@ export function FilterProvider({ children }: FilterProviderProps) {
                 selectedCity: null
             };
 
-            // Set the specific filter based on scope
+            // Define o filtro específico baseado no escopo
             switch (scope) {
                 case 'brasil':
-                    // All geographic filters remain null
+                    // Todos os filtros geográficos permanecem nulos
                     break;
                 case 'csa':
                     newFilters.selectedCSA = value;
@@ -142,7 +151,7 @@ export function FilterProvider({ children }: FilterProviderProps) {
     }, []);
 
     /**
-     * Set date range filter
+     * Define filtro de intervalo de datas
      */
     const setDateRange = useCallback((start: Date | null, end: Date | null): void => {
         setFilters(prev => ({
@@ -152,26 +161,26 @@ export function FilterProvider({ children }: FilterProviderProps) {
     }, []);
 
     /**
-     * Clear all filters
+     * Limpa todos os filtros
      */
     const clearFilters = useCallback((): void => {
         setFilters(createInitialFilterState());
     }, []);
 
     /**
-     * Apply filters to records and return filtered results
+     * Aplica filtros aos registros e retorna resultados filtrados
      */
     const filteredRecords = useMemo((): CampaignRecord[] => {
         return records.filter(record => {
-            // Geographic filtering
+            // Filtragem geográfica
             switch (filters.geographicScope) {
                 case 'brasil':
-                    // No geographic filter - include all
+                    // Sem filtro geográfico - inclui todos
                     break;
 
                 case 'csa':
                     if (filters.selectedCSA) {
-                        // Check if the record's CSR-CSA map contains the selected CSA
+                        // Verifica se o mapa CSR-CSA do registro contém o CSA selecionado
                         const recordCSAs = Object.values(record.csrCSAMap).filter(Boolean);
                         if (!recordCSAs.includes(filters.selectedCSA)) {
                             return false;
@@ -181,7 +190,7 @@ export function FilterProvider({ children }: FilterProviderProps) {
 
                 case 'region':
                     if (filters.selectedRegion) {
-                        // Filter by CSR (region)
+                        // Filtra por CSR (região)
                         if (record.selectedCSR !== filters.selectedRegion) {
                             return false;
                         }
@@ -205,7 +214,7 @@ export function FilterProvider({ children }: FilterProviderProps) {
                     break;
             }
 
-            // Date range filtering
+            // Filtragem por intervalo de datas
             if (filters.dateRange.start || filters.dateRange.end) {
                 const activityDate = record.activityDate;
 
@@ -218,12 +227,12 @@ export function FilterProvider({ children }: FilterProviderProps) {
                 }
             }
 
-            // Record passed all filters
+            // Registro passou por todos os filtros
             return true;
         });
     }, [records, filters]);
 
-    // Context value
+    // Valor do contexto
     const value: FilterContextValue = {
         filters,
         setGeographicFilter,
@@ -241,21 +250,21 @@ export function FilterProvider({ children }: FilterProviderProps) {
 }
 
 /**
- * Custom hook to use FilterContext
- * @throws {Error} If used outside of FilterProvider
+ * Hook customizado para usar o FilterContext
+ * @throws {Error} Se usado fora de um FilterProvider
  */
 // eslint-disable-next-line react-refresh/only-export-components
 export function useFilters(): FilterContextValue {
     const context = useContext(FilterContext);
 
     if (context === undefined) {
-        throw new Error('useFilters must be used within a FilterProvider');
+        throw new Error('useFilters deve ser usado dentro de um FilterProvider');
     }
 
     return context;
 }
 
 /**
- * Export the context for testing purposes
+ * Exporta o contexto para fins de teste
  */
 export { FilterContext };

@@ -1,34 +1,35 @@
 /**
- * Dashboard Component Tests
+ * Testes do Componente Dashboard
  * 
- * Tests for the Dashboard layout component including:
- * - Loading state display
- * - Error state display with retry button
- * - Successful data display with all components
+ * Testes para o componente de layout do Dashboard incluindo:
+ * - Exibição do estado de carregamento
+ * - Exibição do estado de erro com botão de tentar novamente
+ * - Exibição bem-sucedida de dados com todos os componentes
  * 
- * Requirements: 7.6, 8.1, 9.1
+ * Requisitos: 7.6, 8.1, 9.1
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { MemoryRouter } from 'react-router-dom';
 import { Dashboard } from './Dashboard';
 import { DataProvider } from '../contexts/DataContext';
 import { FilterProvider } from '../contexts/FilterContext';
 import type { CampaignRecord } from '../types';
 
-// Create mock functions at module level
+// Cria funções mock no nível do módulo
 const mockFetchData = vi.fn();
 const mockParse = vi.fn((data) => data);
 
-// Mock the services module
+// Mock do módulo de serviços
 vi.mock('../services', () => ({
     createGoogleSheetsService: vi.fn(() => ({
         fetchData: mockFetchData
     }))
 }));
 
-// Mock the DataParser as a class constructor
+// Mock do DataParser como construtor de classe
 vi.mock('../utils/DataParser', () => {
     return {
         DataParser: vi.fn(function (this: { parse: typeof mockParse }) {
@@ -37,18 +38,20 @@ vi.mock('../utils/DataParser', () => {
     };
 });
 
-// Helper to render Dashboard with providers
+// Função auxiliar para renderizar Dashboard com providers
 function renderDashboard() {
     return render(
-        <DataProvider>
-            <FilterProvider>
-                <Dashboard />
-            </FilterProvider>
-        </DataProvider>
+        <MemoryRouter>
+            <DataProvider>
+                <FilterProvider>
+                    <Dashboard />
+                </FilterProvider>
+            </DataProvider>
+        </MemoryRouter>
     );
 }
 
-describe('Dashboard Component', () => {
+describe('Componente Dashboard', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         mockFetchData.mockReset();
@@ -56,56 +59,56 @@ describe('Dashboard Component', () => {
         mockParse.mockImplementation((data) => data);
     });
 
-    it('should display loading state initially', () => {
-        // Mock a slow fetch to keep loading state
-        mockFetchData.mockReturnValue(new Promise(() => { })); // Never resolves
+    it('deve exibir estado de carregamento inicialmente', () => {
+        // Mock de fetch lento para manter o estado de carregamento
+        mockFetchData.mockReturnValue(new Promise(() => { })); // Nunca resolve
 
         renderDashboard();
 
-        // Check for loading indicator
+        // Verifica o indicador de carregamento
         expect(screen.getByText(/Carregando dados/i)).toBeInTheDocument();
     });
 
-    it('should display error state with retry button when fetch fails', async () => {
-        // Mock fetch failure
+    it('deve exibir estado de erro com botão de tentar novamente quando fetch falha', async () => {
+        // Mock de falha no fetch
         mockFetchData.mockRejectedValue(new Error('Network error'));
 
         renderDashboard();
 
-        // Wait for error state
+        // Aguarda o estado de erro
         await waitFor(() => {
             expect(screen.getByText(/Erro ao Carregar Dados/i)).toBeInTheDocument();
         });
 
-        // Check for error message
+        // Verifica a mensagem de erro
         expect(screen.getByText(/Network error/i)).toBeInTheDocument();
 
-        // Check for retry button
+        // Verifica o botão de tentar novamente
         expect(screen.getByText(/Tentar Novamente/i)).toBeInTheDocument();
     });
 
-    it('should call refetch when retry button is clicked', async () => {
+    it('deve chamar refetch quando botão de tentar novamente é clicado', async () => {
         mockFetchData.mockRejectedValue(new Error('Network error'));
 
         renderDashboard();
 
-        // Wait for error state
+        // Aguarda o estado de erro
         await waitFor(() => {
             expect(screen.getByText(/Tentar Novamente/i)).toBeInTheDocument();
         });
 
-        // Click retry button
+        // Clica no botão de tentar novamente
         const retryButton = screen.getByText(/Tentar Novamente/i);
         await userEvent.click(retryButton);
 
-        // Verify fetchData was called again
+        // Verifica se fetchData foi chamado novamente
         await waitFor(() => {
-            expect(mockFetchData).toHaveBeenCalledTimes(2); // Initial + retry
+            expect(mockFetchData).toHaveBeenCalledTimes(2); // Inicial + retry
         });
     });
 
-    it('should render all dashboard components when data loads successfully', async () => {
-        // Mock successful data fetch
+    it('deve renderizar todos os componentes do dashboard quando dados carregam com sucesso', async () => {
+        // Mock de fetch de dados bem-sucedido
         const mockData: CampaignRecord[] = [
             {
                 id: '1',
@@ -153,40 +156,40 @@ describe('Dashboard Component', () => {
 
         renderDashboard();
 
-        // Wait for data to load
+        // Aguarda o carregamento dos dados
         await waitFor(() => {
             expect(screen.queryByText(/Carregando dados/i)).not.toBeInTheDocument();
         });
 
-        // Check that header is rendered
+        // Verifica se o header foi renderizado
         expect(screen.getByText(/Relatório Nacional de RP\/IP/i)).toBeInTheDocument();
 
-        // Check that summary cards section is present (at least one card)
+        // Verifica se a seção de cards de resumo está presente (pelo menos um card)
         expect(screen.getByText(/Quantidade de Atividades/i)).toBeInTheDocument();
 
-        // Check that charts are rendered (by their titles)
+        // Verifica se os gráficos foram renderizados (pelos títulos)
         expect(screen.getByText(/Estrutura de Serviço/i)).toBeInTheDocument();
         expect(screen.getByText(/Tipo de Atividade/i)).toBeInTheDocument();
         expect(screen.getByText(/Atividades ao Longo do Tempo/i)).toBeInTheDocument();
 
-        // Check that geographic ranking is rendered
+        // Verifica se o ranking geográfico foi renderizado
         expect(screen.getByText(/Ranking de Estados/i)).toBeInTheDocument();
 
-        // Check that materials table is rendered
+        // Verifica se a tabela de materiais foi renderizada
         expect(screen.getByText(/Materiais Distribuídos/i)).toBeInTheDocument();
     });
 
-    it('should have responsive layout classes', async () => {
+    it('deve ter classes de layout responsivo', async () => {
         mockFetchData.mockResolvedValue([]);
 
         const { container } = renderDashboard();
 
-        // Wait for loading to complete
+        // Aguarda o carregamento completar
         await waitFor(() => {
             expect(screen.queryByText(/Carregando dados/i)).not.toBeInTheDocument();
         });
 
-        // Check for responsive container classes
+        // Verifica as classes de container responsivo
         const mainElement = container.querySelector('main');
         expect(mainElement).toHaveClass('container', 'mx-auto', 'px-4');
     });

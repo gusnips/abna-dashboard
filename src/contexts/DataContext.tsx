@@ -1,12 +1,12 @@
 /**
- * DataContext - Provides campaign data to the entire application
+ * DataContext - Fornece os dados de campanhas para toda a aplicação
  * 
- * This context manages data fetching from Google Sheets, caching,
- * loading states, and error handling. It provides:
- * - Campaign records array
- * - Loading state
- * - Error state
- * - Refetch method
+ * Este contexto gerencia a busca de dados do Google Sheets, cache,
+ * estados de carregamento e tratamento de erros. Ele fornece:
+ * - Array de registros de campanhas
+ * - Estado de carregamento
+ * - Estado de erro
+ * - Método de recarregamento
  */
 
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
@@ -15,26 +15,26 @@ import type { CampaignRecord, DataContextValue } from '../types';
 import { createGoogleSheetsService } from '../services';
 import { DataParser } from '../utils/DataParser';
 
-// Cache key for sessionStorage
+// Chave de cache para sessionStorage
 const CACHE_KEY = 'abna_campaign_data_cache';
 const CACHE_TIMESTAMP_KEY = 'abna_campaign_data_cache_timestamp';
-const CACHE_DURATION = 30 * 60 * 1000; // 30 minutes in milliseconds
+const CACHE_DURATION = 30 * 60 * 1000; // 30 minutos em milissegundos
 
 /**
- * Create the DataContext with undefined default value
- * This forces consumers to use the context within a provider
+ * Cria o DataContext com valor padrão undefined
+ * Isso força os consumidores a usar o contexto dentro de um provider
  */
 const DataContext = createContext<DataContextValue | undefined>(undefined);
 
 /**
- * Props for DataProvider component
+ * Props para o componente DataProvider
  */
 interface DataProviderProps {
     children: ReactNode;
 }
 
 /**
- * DataProvider component that manages campaign data state
+ * Componente DataProvider que gerencia o estado dos dados de campanhas
  */
 export function DataProvider({ children }: DataProviderProps) {
     const [records, setRecords] = useState<CampaignRecord[]>([]);
@@ -42,7 +42,7 @@ export function DataProvider({ children }: DataProviderProps) {
     const [error, setError] = useState<Error | null>(null);
 
     /**
-     * Checks if cached data is still valid
+     * Verifica se os dados em cache ainda são válidos
      */
     const isCacheValid = useCallback((): boolean => {
         try {
@@ -54,13 +54,13 @@ export function DataProvider({ children }: DataProviderProps) {
             const cacheAge = Date.now() - parseInt(timestamp, 10);
             return cacheAge < CACHE_DURATION;
         } catch {
-            // If sessionStorage is not available or throws an error
+            // Se sessionStorage não estiver disponível ou lançar um erro
             return false;
         }
     }, []);
 
     /**
-     * Retrieves cached data from sessionStorage
+     * Recupera os dados em cache do sessionStorage
      */
     const getCachedData = useCallback((): CampaignRecord[] | null => {
         try {
@@ -71,64 +71,64 @@ export function DataProvider({ children }: DataProviderProps) {
 
             const parsed = JSON.parse(cached) as CampaignRecord[];
 
-            // Convert date strings back to Date objects
+            // Converte strings de data de volta para objetos Date
             return parsed.map((record) => ({
                 ...record,
                 timestamp: new Date(record.timestamp),
                 activityDate: new Date(record.activityDate)
             }));
         } catch (err) {
-            console.warn('Failed to retrieve cached data:', err);
+            console.warn('Falha ao recuperar dados em cache:', err);
             return null;
         }
     }, [isCacheValid]);
 
     /**
-     * Saves data to sessionStorage cache
+     * Salva os dados no cache do sessionStorage
      */
     const setCachedData = useCallback((data: CampaignRecord[]): void => {
         try {
             sessionStorage.setItem(CACHE_KEY, JSON.stringify(data));
             sessionStorage.setItem(CACHE_TIMESTAMP_KEY, Date.now().toString());
         } catch (err) {
-            console.warn('Failed to cache data:', err);
-            // Continue without caching - not a critical error
+            console.warn('Falha ao salvar dados em cache:', err);
+            // Continua sem cache - não é um erro crítico
         }
     }, []);
 
     /**
-     * Fetches data from Google Sheets API
+     * Busca dados da API do Google Sheets
      */
     const fetchData = useCallback(async (): Promise<void> => {
         setLoading(true);
         setError(null);
 
         try {
-            // Create service and parser
+            // Cria o serviço e o parser
             const service = createGoogleSheetsService();
             const parser = new DataParser();
 
-            // Fetch raw data from Google Sheets
+            // Busca dados brutos do Google Sheets
             const rawData = await service.fetchData();
 
-            // Parse raw data into CampaignRecord objects
+            // Converte dados brutos em objetos CampaignRecord
             const parsedRecords = parser.parse(rawData);
 
-            // Update state
+            // Atualiza o estado
             setRecords(parsedRecords);
             setError(null);
 
-            // Cache the data
+            // Salva os dados em cache
             setCachedData(parsedRecords);
         } catch (err) {
             const errorObj = err instanceof Error ? err : new Error(String(err));
             setError(errorObj);
 
-            // Try to use cached data if available
+            // Tenta usar dados em cache se disponíveis
             const cachedData = getCachedData();
             if (cachedData && cachedData.length > 0) {
                 setRecords(cachedData);
-                // Update error to indicate we're using cached data
+                // Atualiza o erro para indicar que estamos usando dados em cache
                 setError(new Error('Usando dados em cache. ' + errorObj.message));
             } else {
                 setRecords([]);
@@ -139,28 +139,28 @@ export function DataProvider({ children }: DataProviderProps) {
     }, [getCachedData, setCachedData]);
 
     /**
-     * Refetch data (exposed to consumers)
+     * Recarrega os dados (exposto aos consumidores)
      */
     const refetch = useCallback(async (): Promise<void> => {
         await fetchData();
     }, [fetchData]);
 
     /**
-     * Load data on mount
-     * First try to use cached data for instant display,
-     * then fetch fresh data in the background
+     * Carrega os dados na montagem
+     * Primeiro tenta usar dados em cache para exibição instantânea,
+     * depois busca dados atualizados em segundo plano
      */
     useEffect(() => {
         const loadData = async () => {
-            // Try to load from cache first for instant display
+            // Tenta carregar do cache primeiro para exibição instantânea
             const cachedData = getCachedData();
             if (cachedData && cachedData.length > 0) {
                 setRecords(cachedData);
                 setLoading(false);
-                // Still fetch fresh data in background
+                // Ainda busca dados atualizados em segundo plano
                 fetchData();
             } else {
-                // No cache, fetch data
+                // Sem cache, busca os dados
                 await fetchData();
             }
         };
@@ -168,7 +168,7 @@ export function DataProvider({ children }: DataProviderProps) {
         loadData();
     }, [fetchData, getCachedData]);
 
-    // Context value
+    // Valor do contexto
     const value: DataContextValue = {
         records,
         loading,
@@ -184,21 +184,21 @@ export function DataProvider({ children }: DataProviderProps) {
 }
 
 /**
- * Custom hook to use DataContext
- * @throws {Error} If used outside of DataProvider
+ * Hook customizado para usar o DataContext
+ * @throws {Error} Se usado fora de um DataProvider
  */
 // eslint-disable-next-line react-refresh/only-export-components
 export function useData(): DataContextValue {
     const context = useContext(DataContext);
 
     if (context === undefined) {
-        throw new Error('useData must be used within a DataProvider');
+        throw new Error('useData deve ser usado dentro de um DataProvider');
     }
 
     return context;
 }
 
 /**
- * Export the context for testing purposes
+ * Exporta o contexto para fins de teste
  */
 export { DataContext };

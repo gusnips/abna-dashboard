@@ -1,12 +1,12 @@
 /**
- * Unit tests for FilterContext
- * Tests filter state management, geographic filter mutual exclusivity, and filtering logic
+ * Testes unitários para FilterContext
+ * Testa gerenciamento de estado de filtros, exclusividade mútua de filtros geográficos e lógica de filtragem
  */
 
 import { describe, it, expect } from 'vitest';
 import type { CampaignRecord, FilterState, GeographicScope } from '../types';
 
-// Helper function to create initial filter state
+// Função auxiliar para criar estado inicial de filtros
 const createInitialFilterState = (): FilterState => ({
     geographicScope: 'brasil',
     selectedCSA: null,
@@ -19,7 +19,7 @@ const createInitialFilterState = (): FilterState => ({
     }
 });
 
-// Helper function to apply geographic filter with mutual exclusivity
+// Função auxiliar para aplicar filtro geográfico com exclusividade mútua
 const applyGeographicFilter = (
     currentState: FilterState,
     scope: GeographicScope,
@@ -54,10 +54,11 @@ const applyGeographicFilter = (
     return newFilters;
 };
 
-// Helper function to filter records
+
+// Função auxiliar para filtrar registros
 const filterRecords = (records: CampaignRecord[], filters: FilterState): CampaignRecord[] => {
     return records.filter(record => {
-        // Geographic filtering
+        // Filtragem geográfica
         switch (filters.geographicScope) {
             case 'brasil':
                 break;
@@ -96,7 +97,7 @@ const filterRecords = (records: CampaignRecord[], filters: FilterState): Campaig
                 break;
         }
 
-        // Date range filtering
+        // Filtragem por intervalo de datas
         if (filters.dateRange.start || filters.dateRange.end) {
             const activityDate = record.activityDate;
 
@@ -113,8 +114,9 @@ const filterRecords = (records: CampaignRecord[], filters: FilterState): Campaig
     });
 };
 
-describe('FilterContext Logic', () => {
-    it('should create initial filter state with brasil scope', () => {
+
+describe('Lógica do FilterContext', () => {
+    it('deve criar estado inicial de filtros com escopo brasil', () => {
         const state = createInitialFilterState();
 
         expect(state.geographicScope).toBe('brasil');
@@ -126,7 +128,7 @@ describe('FilterContext Logic', () => {
         expect(state.dateRange.end).toBeNull();
     });
 
-    it('should implement geographic filter mutual exclusivity - state filter', () => {
+    it('deve implementar exclusividade mútua de filtro geográfico - filtro de estado', () => {
         const initialState = createInitialFilterState();
         const newState = applyGeographicFilter(initialState, 'state', 'SP');
 
@@ -137,27 +139,27 @@ describe('FilterContext Logic', () => {
         expect(newState.selectedCity).toBeNull();
     });
 
-    it('should implement geographic filter mutual exclusivity - switching filters', () => {
+    it('deve implementar exclusividade mútua de filtro geográfico - alternando filtros', () => {
         const initialState = createInitialFilterState();
 
-        // Set state filter
+        // Define filtro de estado
         const stateFiltered = applyGeographicFilter(initialState, 'state', 'SP');
         expect(stateFiltered.selectedState).toBe('SP');
 
-        // Switch to city filter - should clear state
+        // Alterna para filtro de cidade - deve limpar estado
         const cityFiltered = applyGeographicFilter(stateFiltered, 'city', 'São Paulo');
         expect(cityFiltered.geographicScope).toBe('city');
         expect(cityFiltered.selectedCity).toBe('São Paulo');
         expect(cityFiltered.selectedState).toBeNull();
 
-        // Switch to brasil - should clear all
+        // Alterna para brasil - deve limpar todos
         const brasilFiltered = applyGeographicFilter(cityFiltered, 'brasil', null);
         expect(brasilFiltered.geographicScope).toBe('brasil');
         expect(brasilFiltered.selectedCity).toBeNull();
         expect(brasilFiltered.selectedState).toBeNull();
     });
 
-    it('should filter records by state', () => {
+    it('deve filtrar registros por estado', () => {
         const records: CampaignRecord[] = [
             {
                 id: '1',
@@ -185,7 +187,8 @@ describe('FilterContext Logic', () => {
         expect(filtered[0].state).toBe('SP');
     });
 
-    it('should filter records by date range', () => {
+
+    it('deve filtrar registros por intervalo de datas', () => {
         const records: CampaignRecord[] = [
             {
                 id: '1',
@@ -219,7 +222,7 @@ describe('FilterContext Logic', () => {
         expect(filtered[1].id).toBe('2');
     });
 
-    it('should filter records by city', () => {
+    it('deve filtrar registros por cidade', () => {
         const records: CampaignRecord[] = [
             {
                 id: '1',
@@ -243,7 +246,7 @@ describe('FilterContext Logic', () => {
         expect(filtered[0].city).toBe('São Paulo');
     });
 
-    it('should return all records when no filters applied', () => {
+    it('deve retornar todos os registros quando nenhum filtro é aplicado', () => {
         const records: CampaignRecord[] = [
             {
                 id: '1',

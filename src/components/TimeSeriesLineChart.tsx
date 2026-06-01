@@ -1,37 +1,37 @@
 /**
- * TimeSeriesLineChart - Displays activities over time
+ * TimeSeriesLineChart - Exibe atividades ao longo do tempo
  * 
- * Shows a line chart of activities aggregated by date (daily)
+ * Mostra um gráfico de linha de atividades agregadas por data (diário)
  * 
- * Requirements: 3.3, 3.5, 3.6
+ * Requisitos: 3.3, 3.5, 3.6
  */
 
 import { useMemo } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { useFilters } from '../contexts/FilterContext';
 import type { TimeSeriesData } from '../types';
 
 /**
- * TimeSeriesLineChart component
+ * Componente TimeSeriesLineChart
  */
 export function TimeSeriesLineChart() {
     const { filteredRecords } = useFilters();
 
     /**
-     * Aggregate activities by date (daily)
+     * Agrega atividades por data (diário)
      */
     const chartData = useMemo((): TimeSeriesData[] => {
         const dateCountMap = new Map<string, number>();
 
-        // Count activities by date
+        // Conta atividades por data
         for (const record of filteredRecords) {
-            // Format date as YYYY-MM-DD for grouping
+            // Formata data como YYYY-MM-DD para agrupamento
             const dateStr = record.activityDate.toISOString().split('T')[0];
             const count = dateCountMap.get(dateStr) || 0;
             dateCountMap.set(dateStr, count + 1);
         }
 
-        // Convert to chart data format and sort by date
+        // Converte para formato de dados do gráfico e ordena por data
         const data = Array.from(dateCountMap.entries())
             .map(([date, count]) => ({
                 date,
@@ -43,14 +43,14 @@ export function TimeSeriesLineChart() {
     }, [filteredRecords]);
 
     /**
-     * Format date for display (DD/MM/YYYY)
+     * Formata data para exibição (DD/MM/YYYY)
      */
     const formatDate = (dateStr: string): string => {
         const [year, month, day] = dateStr.split('-');
         return `${day}/${month}/${year}`;
     };
 
-    // Handle empty data state
+    // Gerencia estado de dados vazio
     if (chartData.length === 0) {
         return (
             <div className="chart-empty-state">
@@ -63,31 +63,39 @@ export function TimeSeriesLineChart() {
         <div className="chart-container">
             <h3 className="chart-title">Atividades ao Longo do Tempo</h3>
             <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={chartData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+                <AreaChart data={chartData}>
+                    <defs>
+                        <linearGradient id="ts-area" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor="#0E9F6E" stopOpacity={0.35} />
+                            <stop offset="100%" stopColor="#0E9F6E" stopOpacity={0.02} />
+                        </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" vertical={false} />
                     <XAxis
                         dataKey="date"
                         tickFormatter={formatDate}
                         angle={-45}
                         textAnchor="end"
                         height={80}
+                        tickLine={false}
                     />
-                    <YAxis label={{ value: 'Quantidade', angle: -90, position: 'insideLeft' }} />
+                    <YAxis label={{ value: 'Quantidade', angle: -90, position: 'insideLeft' }} tickLine={false} axisLine={false} />
                     <Tooltip
                         labelFormatter={formatDate}
                         formatter={(value: number | undefined) => value ? [`${value} atividades`, 'Atividades'] : ['', 'Atividades']}
                     />
-                    <Legend />
-                    <Line
+                    <Legend iconType="circle" />
+                    <Area
                         type="monotone"
                         dataKey="count"
-                        stroke="#10B981"
-                        strokeWidth={2}
+                        stroke="#0E9F6E"
+                        strokeWidth={2.5}
+                        fill="url(#ts-area)"
                         name="Atividades"
-                        dot={{ r: 4, fill: '#10B981' }}
-                        activeDot={{ r: 6, fill: '#10B981' }}
+                        dot={{ r: 3, fill: '#0E9F6E', strokeWidth: 0 }}
+                        activeDot={{ r: 6, fill: '#0E9F6E', stroke: '#ffffff', strokeWidth: 2 }}
                     />
-                </LineChart>
+                </AreaChart>
             </ResponsiveContainer>
         </div>
     );
