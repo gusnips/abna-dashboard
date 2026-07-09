@@ -7,7 +7,7 @@
  * (ex: nas páginas CSR independentes). O estilo segue o tema de gráficos compartilhado.
  */
 
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { BarChart, Bar, XAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, LabelList } from 'recharts';
 import { ChartGradients } from './ChartGradients';
 import { BAR_FILL } from './chartTheme';
 import type { ChartData } from '../types';
@@ -59,17 +59,14 @@ export function CategoryBarChart({
                         tick={{ fontSize: 12 }}
                         tickLine={false}
                     />
-                    <YAxis
-                        label={{ value: 'Quantidade', angle: -90, position: 'insideLeft' }}
-                        tickLine={false}
-                        axisLine={false}
-                    />
                     <Tooltip
                         cursor={{ fill: 'rgb(37 99 235 / 0.08)' }}
                         formatter={(value: number | undefined) => value ? `${value} ${seriesName.toLowerCase()}` : ''}
                     />
                     <Legend iconType="circle" />
-                    <Bar dataKey="value" fill={BAR_FILL[color]} name={seriesName} radius={[6, 6, 0, 0]} maxBarSize={72} />
+                    <Bar dataKey="value" fill={BAR_FILL[color]} name={seriesName} radius={[6, 6, 0, 0]} maxBarSize={72}>
+                        <LabelList dataKey="value" position="insideTop" fill="#0f172a" fontSize={12} fontWeight={700} />
+                    </Bar>
                 </BarChart>
             </ResponsiveContainer>
         </div>

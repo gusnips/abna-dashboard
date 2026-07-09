@@ -7,7 +7,7 @@
  */
 
 import { useMemo } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { BarChart, Bar, XAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, LabelList } from 'recharts';
 import { useFilters } from '../contexts/FilterContext';
 import { aggregateByHour } from '../utils';
 import { ChartGradients } from './ChartGradients';
@@ -47,10 +47,11 @@ export function ActivityByHourChart() {
                     <ChartGradients />
                     <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" vertical={false} />
                     <XAxis dataKey="name" interval={0} tick={{ fontSize: 12 }} tickLine={false} />
-                    <YAxis label={{ value: 'Quantidade', angle: -90, position: 'insideLeft' }} tickLine={false} axisLine={false} />
                     <Tooltip cursor={{ fill: 'rgb(245 158 11 / 0.08)' }} formatter={(value: number | undefined) => value ? `${value} atividades` : ''} />
                     <Legend iconType="circle" />
-                    <Bar dataKey="value" fill={BAR_FILL.amber} name="Atividades" radius={[6, 6, 0, 0]} maxBarSize={64} />
+                    <Bar dataKey="value" fill={BAR_FILL.amber} name="Atividades" radius={[6, 6, 0, 0]} maxBarSize={64}>
+                        <LabelList dataKey="value" position="insideTop" fill="#0f172a" fontSize={12} fontWeight={700} />
+                    </Bar>
                 </BarChart>
             </ResponsiveContainer>
         </div>

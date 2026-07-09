@@ -9,7 +9,7 @@
  */
 
 import { useMemo } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { BarChart, Bar, XAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, LabelList } from 'recharts';
 import { useFilters } from '../contexts/FilterContext';
 import { rankCSRsByActivityCount, rankCSAsByActivityCount } from '../utils';
 import { ChartGradients } from './ChartGradients';
@@ -62,10 +62,11 @@ export function RegionalActivityChart() {
                         tick={{ fontSize: 12 }}
                         tickLine={false}
                     />
-                    <YAxis label={{ value: 'Quantidade', angle: -90, position: 'insideLeft' }} tickLine={false} axisLine={false} />
                     <Tooltip cursor={{ fill: 'rgb(20 184 166 / 0.08)' }} formatter={(value: number | undefined) => value ? `${value} atividades` : ''} />
                     <Legend iconType="circle" />
-                    <Bar dataKey="value" fill={BAR_FILL.teal} name="Atividades" radius={[6, 6, 0, 0]} maxBarSize={72} />
+                    <Bar dataKey="value" fill={BAR_FILL.teal} name="Atividades" radius={[6, 6, 0, 0]} maxBarSize={72}>
+                        <LabelList dataKey="value" position="insideTop" fill="#0f172a" fontSize={12} fontWeight={700} />
+                    </Bar>
                 </BarChart>
             </ResponsiveContainer>
         </div>

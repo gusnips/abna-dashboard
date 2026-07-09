@@ -91,7 +91,7 @@ export function Dashboard() {
     // Layout principal do dashboard
     return (
         <div className="min-h-screen">
-            {/* Cabeçalho */}
+            {/* Cabeçalho (banner de marca global + barra fixa de navegação) */}
             <Header selectedCSR={filters.selectedRegion} />
 
             {/* Conteúdo Principal */}
@@ -101,12 +101,19 @@ export function Dashboard() {
                     <FilterBar />
                 </section>
 
-                {/* Cards de Resumo */}
+                {/* Cards de Resumo (números) */}
                 <section>
                     <SummaryCards />
                 </section>
 
-                {/* Seção de Gráficos - distribuições e tendências */}
+                {/* Primeiros gráficos — ordem solicitada: região, tipo de atividade, atividade realizada */}
+                <section className="space-y-6">
+                    <RegionalActivityChart />
+                    <ActivityTypeColumnChart />
+                    <ActivityColumnChart />
+                </section>
+
+                {/* Demais distribuições e tendências */}
                 <section className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
                     <div className="lg:col-span-1">
                         <ServiceStructurePieChart />
@@ -119,14 +126,9 @@ export function Dashboard() {
                     </div>
                 </section>
 
-                {/* Horário do dia e detalhamento regional */}
-                <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div>
-                        <ActivityByHourChart />
-                    </div>
-                    <div>
-                        <RegionalActivityChart />
-                    </div>
+                {/* Distribuição por horário do dia */}
+                <section>
+                    <ActivityByHourChart />
                 </section>
 
                 {/* Ranking Geográfico e Tabela de Materiais */}
@@ -137,12 +139,6 @@ export function Dashboard() {
                     <div className="h-full">
                         <MaterialsTable />
                     </div>
-                </section>
-
-                {/* Gráficos de detalhamento de atividades - largura total, um por linha */}
-                <section className="space-y-6">
-                    <ActivityTypeColumnChart />
-                    <ActivityColumnChart />
                 </section>
             </main>
 
