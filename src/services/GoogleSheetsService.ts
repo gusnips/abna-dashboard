@@ -79,7 +79,9 @@ export class GoogleSheetsService {
      */
     async fetchData(): Promise<RawSheetRow[]> {
         const { spreadsheetId, range, apiKey } = this.config;
-        const url = `${this.baseUrl}/${spreadsheetId}/values/${range}?key=${apiKey}`;
+        // O range precisa ser codificado: nomes de aba com espaços/acentos
+        // (ex.: "Respostas ao formulário 4!A:CS") quebram a URL sem encode.
+        const url = `${this.baseUrl}/${spreadsheetId}/values/${encodeURIComponent(range)}?key=${apiKey}`;
 
         try {
             const response = await fetch(url);
@@ -236,13 +238,24 @@ export class GoogleSheetsService {
 }
 
 /**
+ * Padrões públicos (espelham o .env.example) usados quando a variável de ambiente
+ * não está definida — assim o app roda sem .env. A chave é uma API key PÚBLICA do
+ * Google (deve ser restrita por referenciador HTTP no console) e já é embutida no
+ * bundle publicado, então mantê-la aqui não expõe nada novo. Em produção o build
+ * sobrepõe estes valores com os GitHub Secrets.
+ */
+const DEFAULT_API_KEY = 'AIzaSyBYKjFB2d6RTTtmxRBKDbtwD5VKWs8o_z4';
+const DEFAULT_SPREADSHEET_ID = '1X_NnjQTEWJ8Se9Anm5CvD5BIGdjKo5BadYEqnxPnLKY';
+const DEFAULT_RANGE = 'Respostas ao formulário 4!A:CS';
+
+/**
  * Função factory para criar GoogleSheetsService a partir de variáveis de ambiente
  */
 export function createGoogleSheetsService(): GoogleSheetsService {
     const config: GoogleSheetsConfig = {
-        apiKey: import.meta.env.VITE_GOOGLE_SHEETS_API_KEY || '',
-        spreadsheetId: import.meta.env.VITE_GOOGLE_SHEETS_SPREADSHEET_ID || '',
-        range: import.meta.env.VITE_GOOGLE_SHEETS_RANGE || 'Sheet1!A:Z'
+        apiKey: import.meta.env.VITE_GOOGLE_SHEETS_API_KEY || DEFAULT_API_KEY,
+        spreadsheetId: import.meta.env.VITE_GOOGLE_SHEETS_SPREADSHEET_ID || DEFAULT_SPREADSHEET_ID,
+        range: import.meta.env.VITE_GOOGLE_SHEETS_RANGE || DEFAULT_RANGE
     };
 
     return new GoogleSheetsService(config);
