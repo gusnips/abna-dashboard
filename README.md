@@ -12,7 +12,7 @@ Um painel em React para visualizar os dados das campanhas de Narcóticos Anônim
 - **Estilização**: Tailwind CSS 4+
 - **Gráficos**: Recharts
 - **Testes**: Vitest + @testing-library/react + fast-check (PBT)
-- **Implantação**: GitHub Pages
+- **Implantação**: GitHub Pages (padrão) + Cloudflare Pages (opcional)
 
 ## Primeiros Passos
 
@@ -92,6 +92,24 @@ O workflow irá:
 - Instalar as dependências usando Bun
 - Executar o build de produção
 - Implantar no GitHub Pages
+
+### Cloudflare Pages (opcional)
+
+O workflow `.github/workflows/deploy-cloudflare.yml` implanta no Cloudflare Pages **somente se** os segredos do Cloudflare estiverem configurados. Sem eles, o workflow se auto-ignora a cada push e o GitHub Pages continua sendo a implantação padrão — nada a fazer.
+
+Para ativar:
+
+1. **Crie o projeto no Cloudflare Pages** (uma vez): `bunx wrangler pages project create abna-dashboard`
+2. **Adicione os segredos do repositório** em Settings → Secrets and variables → Actions:
+   - `CLOUDFLARE_API_TOKEN`: token de API com a permissão "Cloudflare Pages — Edit"
+   - `CLOUDFLARE_ACCOUNT_ID`: o ID da sua conta Cloudflare (visível no painel do Cloudflare)
+3. **Faça push para `main`** — o build usa os mesmos segredos `VITE_GOOGLE_SHEETS_*` do GitHub Pages
+
+Notas:
+
+- Para usar outro nome de projeto, defina a variável de repositório (`Variables`, não `Secrets`) `CLOUDFLARE_PAGES_PROJECT`
+- O build para o Cloudflare usa `--base=/` (o site é servido na raiz do domínio, diferente do caminho `/abna-dashboard/` do GitHub Pages)
+- Adicione o domínio do Cloudflare (ex.: `https://abna-dashboard.pages.dev/*`) às restrições de referenciador HTTP da chave da API do Google no Google Cloud Console — sem isso, a API do Google Sheets rejeitará as requisições vindas do novo domínio
 
 ### Implantação Manual
 

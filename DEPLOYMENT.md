@@ -175,7 +175,8 @@ O workflow habilitará o GitHub Pages automaticamente na próxima execução.
 
 Arquivos importantes para a implantação:
 
-- `.github/workflows/deploy.yml` - Workflow do GitHub Actions
+- `.github/workflows/deploy-github-pages.yml` - Workflow do GitHub Actions (GitHub Pages)
+- `.github/workflows/deploy-cloudflare.yml` - Workflow opcional do Cloudflare Pages (ativa apenas com os segredos do Cloudflare configurados)
 - `vite.config.ts` - Configuração do Vite com o caminho base
 - `.env.example` - Modelo de variáveis de ambiente
 - `package.json` - Scripts de build e dependências
