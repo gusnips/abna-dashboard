@@ -105,7 +105,9 @@ export function FilterBar() {
                 </svg>
                 <h2 className="text-sm font-semibold uppercase tracking-wide text-ink-600">Filtros</h2>
             </div>
-            <div className="flex flex-col lg:flex-row gap-4 items-end">
+            {/* items-end só no layout em linha: em coluna (mobile) ele encolhe e
+                joga os campos para a direita — no empilhado queremos largura total */}
+            <div className="flex flex-col lg:flex-row gap-4 lg:items-end">
                 {/* Seletor de Escopo Geográfico */}
                 <div className="flex-1 min-w-[200px]">
                     <label htmlFor="geographic-scope" className="field-label">
@@ -244,7 +246,7 @@ export function FilterBar() {
                 <div className="flex-shrink-0">
                     <button
                         onClick={clearFilters}
-                        className="inline-flex items-center gap-2 rounded-xl border border-ink-200 bg-white px-4 py-2.5 text-sm font-semibold text-ink-600 shadow-sm transition-colors hover:bg-ink-100 hover:text-ink-800 focus:outline-none focus:ring-2 focus:ring-ink-300"
+                        className="inline-flex w-full lg:w-auto items-center justify-center gap-2 rounded-xl border border-ink-200 bg-white px-4 py-2.5 text-sm font-semibold text-ink-600 shadow-sm transition-colors hover:bg-ink-100 hover:text-ink-800 focus:outline-none focus:ring-2 focus:ring-ink-300"
                     >
                         <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />

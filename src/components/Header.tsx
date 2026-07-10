@@ -53,18 +53,22 @@ export function Header({ selectedCSR }: HeaderProps) {
                 ].join(' ')}
                 style={{ backgroundColor: scrolled ? BANNER_BG : 'transparent' }}
             >
-                <div className="container mx-auto px-4 py-3">
+                <div className="container mx-auto px-4 py-2.5 md:py-3">
                     <div className="flex flex-col md:flex-row items-center justify-between gap-3">
-                        {/* Logo + Título */}
+                        {/* Logo + Título. No mobile o logo do NA é redundante (já aparece na
+                            arte do banner logo abaixo), então some — deixando só as abas. */}
                         <Link
                             to="/"
                             aria-label="Ir para o início"
-                            className="flex items-center gap-3 rounded-2xl transition-opacity duration-200 hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
+                            className={[
+                                'items-center gap-3 rounded-2xl transition-opacity duration-200 hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60',
+                                selectedCSR ? 'flex' : 'hidden md:flex',
+                            ].join(' ')}
                         >
                             <img
                                 src="https://www.na.org.br/wp-content/uploads/2020/04/logo-narcoticos-anonimos.png"
                                 alt="Narcóticos Anônimos"
-                                className="h-11 w-auto bg-white px-3 py-1.5 rounded-xl shadow-soft ring-1 ring-white/40"
+                                className="hidden md:block h-11 w-auto bg-white px-3 py-1.5 rounded-xl shadow-soft ring-1 ring-white/40"
                                 onError={(e) => {
                                     console.error('Falha ao carregar logo do NA');
                                     e.currentTarget.style.display = 'none';
@@ -98,7 +102,7 @@ export function Header({ selectedCSR }: HeaderProps) {
                 ponytail: `scale` recorta a franja clara de ~1px das bordas do JPEG; ao receber
                 um SVG/PNG transparente em alta resolução, remova o scale e a cor de fundo fixa. */}
             <div style={{ backgroundColor: BANNER_BG, marginTop: -navHeight, paddingTop: navHeight }}>
-                <div className="container mx-auto px-4 pt-2 pb-6">
+                <div className="container mx-auto px-4 pt-2 pb-4 md:pb-6">
                     <div className="mx-auto w-full max-w-3xl overflow-hidden">
                         <img
                             src={headerImage}
