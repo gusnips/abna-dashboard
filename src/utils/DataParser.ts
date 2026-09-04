@@ -44,6 +44,12 @@ const BRAZILIAN_STATES = [
 ] as const;
 
 /**
+ * Data no padrão brasileiro gravado pela planilha: dd/mm/aaaa, com hora opcional
+ * ("04/11/2025" ou "04/11/2025 21:32:38")
+ */
+const BR_DATE_PATTERN = /^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:[\s,]+(\d{1,2}):(\d{2})(?::(\d{2}))?)?$/;
+
+/**
  * Nomes dos CSRs para mapeamento
  */
 const CSR_NAMES = [
@@ -116,14 +122,21 @@ export class DataParser {
      * @throws {DataParseError} Se campos obrigatórios estiverem ausentes ou inválidos
      */
     parseRow(row: RawSheetRow): CampaignRecord {
-        // Valida campos obrigatórios
-        const id = this.getRequiredString(row, 'ID_Resposta');
+        // O ID_Resposta não vem do formulário: é preenchido por um script na
+        // planilha, que chega vazio nas respostas mais recentes. Como ele não
+        // identifica nada na interface, uma resposta válida nunca deve ser
+        // descartada por falta dele.
+        const responseId = this.getString(row, 'ID_Resposta');
 
         // Processa todos os campos com tratamento de erro apropriado
         const timestamp = this.parseDate(row['Carimbo de data/hora']);
         if (!timestamp) {
-            throw new DataParseError('Timestamp inválido', id, 'Carimbo de data/hora');
+            throw new DataParseError('Timestamp inválido', responseId ?? undefined, 'Carimbo de data/hora');
         }
+
+        // ponytail: dois envios no mesmo segundo colidiriam. O id não é usado
+        // como chave em lugar nenhum, então basta ser estável entre recargas.
+        const id = responseId ?? `sem-id-${timestamp.getTime()}`;
 
         const selectedCSR = this.getRequiredString(row, 'Selecione o CSR');
         const stateRaw = this.getRequiredString(row, 'Selecione o Estado');
@@ -328,6 +341,11 @@ export class DataParser {
 
     /**
      * Processa uma data de vários formatos
+     *
+     * A planilha grava no padrão brasileiro (dd/mm/aaaa, hora opcional), que
+     * precisa de parsing explícito: `new Date()` lê barras como mm/dd/aaaa e
+     * erra silenciosamente todo dia menor ou igual a 12 ("04/11/2025" viraria
+     * 11 de abril) ou devolve Invalid Date acima disso ("23/02/2026").
      */
     parseDate(value: unknown): Date | null {
         if (!value || value === '') {
@@ -341,6 +359,17 @@ export class DataParser {
 
         // Tenta processar como string
         const str = String(value).trim();
+
+        const br = str.match(BR_DATE_PATTERN);
+        if (br) {
+            const [, day, month, year, hours = '0', minutes = '0', seconds = '0'] = br;
+            const date = new Date(+year, +month - 1, +day, +hours, +minutes, +seconds);
+
+            // Descarta datas inexistentes (31/02), que o Date rolaria para março
+            return date.getMonth() === +month - 1 && date.getDate() === +day ? date : null;
+        }
+
+        // Demais formatos (ISO, por exemplo) seguem pelo parser nativo
         const date = new Date(str);
 
         if (isNaN(date.getTime())) {
